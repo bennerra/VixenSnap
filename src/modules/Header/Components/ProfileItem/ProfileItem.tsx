@@ -4,6 +4,7 @@ import classNames from "classnames/bind";
 
 import { ThemeContext } from "@/context";
 
+import { AppRoutes } from "@/constants/paths";
 import styles from "./styles.module.scss";
 
 const cx = classNames.bind(styles);
@@ -20,7 +21,7 @@ const ProfileItem: FC<ProfileItemProps> = ({ img, text, onClick }) => {
   return (
     <li onClick={onClick}>
       {text === "Личный кабинет" ? (
-        <Link to="/profile">
+        <Link to={AppRoutes.PROFILE_ME}>
           <span className={cx("profile-item", `profile-item-${theme}`)}>
             {img}
             {text}

@@ -9,7 +9,6 @@ import { IRegistrationForm } from "@/models/IRegistrationForm";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { ThemeContext } from "@/context";
 import { AuthButtonsList } from "@/modules/AuthButtonsList";
-import { getUserToken } from "@/utils/getUserToken";
 
 import { Input } from "@/ui/Input";
 
@@ -38,16 +37,22 @@ const RegistrationForm: FC = () => {
     resolver: yupResolver(schema) as any,
   });
   const { registrationError } = useAppSelector((state) => state.error);
+  const requestErrors = Object.values(registrationError).flat();
 
   const onSubmit: SubmitHandler<IRegistrationForm> = async (data) => {
-    await dispatch(registrationUser(data) as any);
-    await dispatch(
-      loginUser({
-        login: data.username || data.email,
-        password: data.password,
-      }) as any
-    );
-    await getUserToken(dispatch);
+    try {
+      const res = await dispatch(registrationUser(data));
+      if (res?.status === 201) {
+        await dispatch(
+          loginUser({
+            username: data.username || data.email,
+            password: data.password,
+          }) as any
+        );
+      }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
@@ -110,11 +115,12 @@ const RegistrationForm: FC = () => {
           </div>
         )}
       </div>
-      {registrationError && (
-        <div className={cx("registration-form__error")}>
-          {registrationError}
-        </div>
-      )}
+      {!!requestErrors.length &&
+        requestErrors.map((item) => (
+          <div key={item} className={cx("registration-form__error")}>
+            {item}
+          </div>
+        ))}
       <AuthButtonsList text="Зарегистрироваться" />
     </form>
   );

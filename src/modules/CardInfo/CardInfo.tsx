@@ -1,15 +1,15 @@
-import { FC, useContext, useEffect, useState } from "react";
+import { FC, useContext, useEffect, useMemo, useState } from "react";
 import classNames from "classnames/bind";
 
 import { ThemeContext } from "@/context";
-import { useAppDispatch } from "@/hooks/redux";
-import { setUserCardInfo } from "@/store/action-creators/user";
 import { setLike } from "@/api/like";
 
 import { Button } from "@/ui/Button";
 import { ReactComponent as Like } from "@/assets/likes-filled.svg";
 import { ReactComponent as EmptyLike } from "@/assets/empty-like.svg";
 
+import { Link } from "react-router-dom";
+import { useAppSelector } from "@/hooks/redux";
 import styles from "./styles.module.scss";
 
 const cx = classNames.bind(styles);
@@ -22,7 +22,8 @@ interface CardInfoProps {
   likes: number;
   is_liked: boolean;
   id: string;
-  owner_id: string;
+  author_id: string;
+  author_name: string;
 }
 
 const CardInfo: FC<CardInfoProps> = ({
@@ -33,15 +34,20 @@ const CardInfo: FC<CardInfoProps> = ({
   likes,
   is_liked,
   id,
-  owner_id,
+  author_name,
+  author_id,
 }) => {
-  const dispatch = useAppDispatch();
   const { theme } = useContext(ThemeContext);
   const [isLike, setIsLike] = useState(false);
   const [countLike, setCountLike] = useState(0);
+  const user = useAppSelector((state) => state.user);
+
+  const linkToUserPage = useMemo(() => {
+    const isUsersCard = user?.userMeInfo.id === author_id;
+    return isUsersCard ? "/profile/me" : `/profile/${author_id}`;
+  }, [author_id, user]);
 
   useEffect(() => {
-    dispatch(setUserCardInfo(owner_id) as any);
     setIsLike(is_liked);
     setCountLike(likes);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,6 +85,9 @@ const CardInfo: FC<CardInfoProps> = ({
               `card-about-${theme}`
             )}
           >
+            <Link to={linkToUserPage}>
+              <div className={cx("card_author")}>{author_name}</div>
+            </Link>
             <div className={cx("card-about__name")}>{name}</div>
             <h2 className={cx("card-about__title")}>{title}</h2>
             <p className={cx("card-about__description")}>{description}</p>

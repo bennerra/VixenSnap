@@ -2,13 +2,13 @@ import { FC, useCallback, useContext, useEffect } from "react";
 import classNames from "classnames/bind";
 import { Navigate } from "react-router-dom";
 
-import { useAppDispatch, useAppSelector } from "@/hooks/redux";
+import { useAppDispatch } from "@/hooks/redux";
 import { getUserData } from "@/utils/getUserData";
 import { oAuthUser } from "@/api/oAuth";
-import { getUserToken } from "@/utils/getUserToken";
 import { ThemeContext } from "@/context";
 
 import { IOAuthUser } from "@/models/IOAuthUser";
+import { LocalStorageNames } from "@/constants/localeStorage";
 import styles from "./styles.module.scss";
 
 const cx = classNames.bind(styles);
@@ -16,18 +16,14 @@ const cx = classNames.bind(styles);
 const OAuth: FC = () => {
   const dispatch = useAppDispatch();
   const { theme } = useContext(ThemeContext);
-  const isAuth = useAppSelector((state) => state.isAuth.isAuth);
+  const isAuth = !!localStorage.getItem(LocalStorageNames.AUTH);
 
   const url = window.location.hash;
   const userData = getUserData(url);
 
-  const setIsAuth = useCallback(
-    async (user: IOAuthUser) => {
-      await oAuthUser(user);
-      await getUserToken(dispatch);
-    },
-    [dispatch]
-  );
+  const setIsAuth = useCallback(async (user: IOAuthUser) => {
+    await oAuthUser(user);
+  }, []);
 
   useEffect(() => {
     setIsAuth(userData);

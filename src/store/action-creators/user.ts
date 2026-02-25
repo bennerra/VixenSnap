@@ -1,4 +1,8 @@
-import { SetUserCardAction, UserActionTypes } from "@/store/types/user";
+import {
+  SetUserCardAction,
+  SetUserMeAction,
+  UserActionTypes,
+} from "@/store/types/user";
 import instance from "@/api/instance";
 import { AppDispatch, RootState } from "@/store";
 import { ThunkAction } from "redux-thunk";
@@ -7,11 +11,11 @@ export const setUserMeInfo = (): ThunkAction<
   void,
   RootState,
   unknown,
-  SetUserCardAction
+  SetUserMeAction
 > => {
   return async (dispatch: AppDispatch) => {
     try {
-      const response = await instance("/users/me", {
+      const response = await instance("api/v1/users/me", {
         method: "get",
       });
       dispatch({
@@ -30,7 +34,7 @@ export const setUserCardInfo = (
 ): ThunkAction<void, RootState, unknown, SetUserCardAction> => {
   return async (dispatch: AppDispatch) => {
     try {
-      const response = await instance(`/users/${id}`, {
+      const response = await instance(`api/v1/users/${id}`, {
         method: "get",
       });
       dispatch({

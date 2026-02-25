@@ -1,6 +1,6 @@
-import { FC, useContext } from "react";
+import { FC, useContext, useEffect } from "react";
 import classNames from "classnames/bind";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 
 import { ThemeContext } from "@/context";
 
@@ -11,28 +11,39 @@ import { CreationCard } from "@/pages/CreationCard";
 import { Profile } from "@/pages/Profile";
 import { Card } from "@/pages/Card";
 import { OAuth } from "@/modules/OAuth";
+import { AppRoutes } from "@/constants/paths";
 
+import { NavigateRouter } from "@/layouts/NavigateRouter/NavigateRouter";
+import { useAppDispatch } from "@/hooks/redux";
+import { setUserMeInfo } from "@/store/action-creators/user";
 import styles from "./styles.module.scss";
 
 const cx = classNames.bind(styles);
 
 const App: FC = () => {
+  const dispatch = useAppDispatch();
   const { theme } = useContext(ThemeContext);
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    dispatch(setUserMeInfo());
+  }, [dispatch]);
 
   return (
-    <div className={cx("App", `App-${theme}`)}>
-      <Router>
+    <NavigateRouter currentPage={pathname as AppRoutes}>
+      <div className={cx("App", `App-${theme}`)}>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/creation" element={<CreationCard />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/card/:id" element={<Card />} />
-          <Route path="/registration" element={<Registration />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/vk_auth" element={<OAuth />} />
+          <Route path={AppRoutes.MAIN} element={<Home />} />
+          <Route path={AppRoutes.CREATION} element={<CreationCard />} />
+          <Route path={AppRoutes.PROFILE} element={<Profile />} />
+          <Route path={AppRoutes.PROFILE_ME} element={<Profile />} />
+          <Route path={AppRoutes.CARD_DETAIL} element={<Card />} />
+          <Route path={AppRoutes.REGISTRATION} element={<Registration />} />
+          <Route path={AppRoutes.AUTH} element={<Login />} />
+          <Route path={AppRoutes.VK_AUTH} element={<OAuth />} />
         </Routes>
-      </Router>
-    </div>
+      </div>
+    </NavigateRouter>
   );
 };
 

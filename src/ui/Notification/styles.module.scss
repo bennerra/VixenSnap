@@ -1,0 +1,31 @@
+@import "../../_variables";
+
+.notification {
+  position: fixed;
+  top: 40px;
+  right: 20px;
+  background-color: $color-white;
+  color: $wet-asphalt;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(44, 44, 44, 0.1),
+  0 0 40px rgba(44, 44, 44, 0.05);
+
+  &.dark {
+    background-color: $wet-asphalt;
+    color: $color-white;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.08),
+    0 0 40px rgba(208, 208, 208, 0.04);
+  }
+}
+
+.notification_container {
+  position: relative;
+  padding: 20px;
+}
+
+.close {
+  position: absolute;
+  top: 7px;
+  right: 10px;
+  cursor: pointer;
+}

@@ -7,7 +7,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { loginUser } from "@/store/action-creators/auth";
 import { ThemeContext } from "@/context";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { getUserToken } from "@/utils/getUserToken";
 import { ILoginForm } from "@/models/ILoginForm";
 
 import { Input } from "@/ui/Input";
@@ -20,7 +19,7 @@ const cx = classNames.bind(styles);
 const schema = yup
   .object()
   .shape({
-    login: yup.string().required(),
+    username: yup.string().required(),
     password: yup.string().required(),
   })
   .required();
@@ -39,22 +38,21 @@ const LoginForm: FC = () => {
 
   const onSubmit: SubmitHandler<ILoginForm> = async (data) => {
     await dispatch(loginUser(data) as any);
-    getUserToken(dispatch);
   };
 
   return (
     <form className={cx("login-form")} onSubmit={handleSubmit(onSubmit)}>
       <div className={cx("login-form__input")}>
         <Input
-          {...register("login")}
+          {...register("username")}
           theme={theme}
           cancelled={!!loginError}
           placeholder="Логин или e-mail"
-          error={errors?.login?.message}
+          error={errors?.username?.message}
         />
-        {errors?.login?.message && (
+        {errors?.username?.message && (
           <div className={cx("login-form__error")}>
-            {errors?.login?.message}
+            {errors?.username?.message}
           </div>
         )}
       </div>
@@ -67,7 +65,7 @@ const LoginForm: FC = () => {
           type="password"
           error={errors?.password?.message}
         />
-        {errors?.login?.message && (
+        {errors?.password?.message && (
           <div className={cx("login-form__error")}>
             {errors?.password?.message}
           </div>

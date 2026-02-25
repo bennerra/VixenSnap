@@ -1,9 +1,7 @@
 import { FC, useContext } from "react";
 import classNames from "classnames/bind";
-import { Navigate } from "react-router-dom";
 
 import { ThemeContext } from "@/context";
-import { useAppSelector } from "@/hooks/redux";
 
 import { CreationCardForm } from "@/modules/CreationCardForm";
 import { Header } from "@/modules/Header";
@@ -14,11 +12,9 @@ const cx = classNames.bind(styles);
 
 const CreationCard: FC = () => {
   const { theme } = useContext(ThemeContext);
-  const isAuth = useAppSelector((state) => state.isAuth.isAuth);
 
   return (
     <main className={cx("creation")}>
-      {!isAuth && <Navigate to="/" replace />}
       <Header />
       <div className={cx("container")}>
         <div className={cx("creation__content", "creation-content")}>

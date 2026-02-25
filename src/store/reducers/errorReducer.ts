@@ -11,6 +11,8 @@ export const errorReducer = (state = initialState, action: ErrorAction) => {
       return { ...state, registrationError: action.payload };
     case ErrorActionTypes.FETCH_LOGIN_ERROR:
       return { ...state, loginError: action.payload };
+    case ErrorActionTypes.FETCH_LOGOUT_ERROR:
+      return { ...state, logoutError: action.payload };
     default:
       return state;
   }

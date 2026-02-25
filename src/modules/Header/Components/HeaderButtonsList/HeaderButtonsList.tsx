@@ -2,18 +2,17 @@ import { FC, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import classNames from "classnames/bind";
 
-import { useAppSelector } from "@/hooks/redux";
 import { ThemeContext } from "@/context";
 import { useResize } from "@/hooks/useResize";
-
 import { Button } from "@/ui/Button";
+import { LocalStorageNames } from "@/constants/localeStorage";
 
 import styles from "./styles.module.scss";
 
 const cx = classNames.bind(styles);
 
 const HeaderButtonsList: FC = () => {
-  const isAuth = useAppSelector((state) => state.isAuth.isAuth);
+  const isAuth = !!localStorage.getItem(LocalStorageNames.AUTH);
   const { theme } = useContext(ThemeContext);
   const { width } = useResize();
   const navigate = useNavigate();

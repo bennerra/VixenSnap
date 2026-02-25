@@ -21,7 +21,7 @@ const Card: FC = () => {
 
   useEffect(() => {
     dispatch(setIsLoading(true));
-    dispatch(getCard(id) as any);
+    dispatch(getCard(id));
     dispatch(setIsLoading(false));
   }, [dispatch, id]);
 
@@ -34,14 +34,15 @@ const Card: FC = () => {
             <CardSkeleton />
           ) : (
             <CardInfo
-              img={`http://s3.darklorian.ru/frames/${card.attachments[0].url}`}
+              img={card.short_url}
               name={userCard.name}
               title={card.name}
               description={card.description}
               likes={card.likes}
-              is_liked={card.is_liked}
+              is_liked={false}
               id={card.id}
-              owner_id={card.owner_id}
+              author_name={card.author_name}
+              author_id={card.author_id}
             />
           )}
         </div>

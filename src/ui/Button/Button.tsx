@@ -17,7 +17,6 @@ const Button: FC<ButtonProps> = ({
   theme,
   color,
   size = "small",
-  onClick,
   ...props
 }) => (
   <button

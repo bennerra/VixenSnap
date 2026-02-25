@@ -9,7 +9,7 @@ export const getCard = (
 ): ThunkAction<void, RootState, unknown, SetUserCardAction> => {
   return async (dispatch: AppDispatch) => {
     try {
-      const response = await instance(`/frames/${id}/`, {
+      const response = await instance(`api/v1/posts/${id}`, {
         method: "get",
       });
       dispatch({

@@ -1,33 +1,71 @@
-import axios, { AxiosResponse, InternalAxiosRequestConfig } from "axios";
-import Cookies from "universal-cookie";
+import { LocalStorageNames } from "@/constants/localeStorage";
+import axios from "axios";
+import { cookies, CookiesNames } from "@/constants/cookies";
+import { refresh } from "@/api/refresh";
+import { AppRoutes, NotAuthPaths } from "@/constants/paths";
 
-const cookies = new Cookies();
+const apiService = process.env.REACT_APP_BASE_URL;
 
-const instance = axios.create({
-  baseURL: process.env.REACT_APP_BASE_URL,
+const apiInstance = axios.create({
+  baseURL: apiService,
 });
 
-const onRequest = async (config: InternalAxiosRequestConfig) => {
-  if (config.url?.includes("token")) {
+apiInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem(LocalStorageNames.AUTH);
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  const token = cookies.get("ob_");
-  if (token) {
-    config.headers.set("Authorization", `Bearer ${token}`);
+);
+
+apiInstance.interceptors.response.use(
+  (config) => {
+    return config;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+    if (
+      error.response.status === 401 &&
+      error.config &&
+      !error.config.isRetry
+    ) {
+      originalRequest.isRetry = true;
+      try {
+        const accessToken = localStorage.getItem(LocalStorageNames.AUTH);
+        const refreshToken = cookies.get(CookiesNames.AUTH);
+        const currentPage = window.location.pathname;
+        const isPublicPath = NotAuthPaths.includes(currentPage as AppRoutes);
+
+        if (isPublicPath) {
+          return await Promise.reject(error);
+        }
+
+        if (!accessToken || !refreshToken) {
+          window.location.href = AppRoutes.AUTH;
+          return await Promise.reject(new Error("Необходима авторизация"));
+        }
+
+        const newTokens = await refresh({ refresh: refreshToken });
+
+        localStorage.setItem(LocalStorageNames.AUTH, newTokens.access);
+        cookies.set(CookiesNames.AUTH, newTokens.refresh, {
+          expires: new Date(Date.now() + 86400000),
+        });
+        originalRequest.headers.Authorization = `Bearer ${newTokens.access}`;
+
+        return await apiInstance(originalRequest);
+      } catch (e) {
+        return e;
+      }
+    }
+
+    return Promise.reject(error);
   }
+);
 
-  return config;
-};
-
-const onResponse = async (response: AxiosResponse) => {
-  if (response.config.url?.includes("token")) {
-    cookies.set("ob_", response.data.access_token);
-  }
-
-  return response;
-};
-
-instance.interceptors.request.use(onRequest);
-instance.interceptors.response.use(onResponse);
-
-export default instance;
+export default apiInstance;

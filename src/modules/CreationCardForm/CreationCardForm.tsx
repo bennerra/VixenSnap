@@ -42,7 +42,7 @@ const CreationCardForm: FC = () => {
     sendData.append("name", data.name);
     sendData.append("description", data.description);
     files.forEach((el: File) => {
-      sendData.append("files", el);
+      sendData.append("image", el);
     });
     await creationCard(sendData);
     dispatch(clearFileForm());
@@ -70,10 +70,10 @@ const CreationCardForm: FC = () => {
           </div>
           <div className={cx("upload__text")}>Загрузите файлы</div>
           <input
-            {...register("files")}
+            {...register("image")}
             className={cx("upload__input")}
             type="file"
-            multiple
+            multiple={false}
             onChange={onImageChange}
             accept=".png, .jpg, .gif, .jpeg, .bmp, .webp, .svg"
           />

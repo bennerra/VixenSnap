@@ -1,12 +1,12 @@
 import {
   GetCardsActionTypes,
-  ResetCardsAction,
   SetIsLoadingAction,
 } from "@/store/types/getCards";
 import { ThunkAction } from "redux-thunk";
 import { AppDispatch, RootState } from "@/store";
 import { SetUserCardAction } from "@/store/types/user";
 import instance from "@/api/instance";
+import { GetMyCardsActionTypes } from "@/store/types/getMyCards";
 
 export const setIsLoading = (isLoading: boolean): SetIsLoadingAction => {
   return { type: GetCardsActionTypes.SET_IS_LOADING, payload: isLoading };
@@ -17,7 +17,7 @@ export const setCards = (
 ): ThunkAction<void, RootState, unknown, SetUserCardAction> => {
   return async (dispatch: AppDispatch) => {
     try {
-      const response = await instance("/frames/", {
+      const response = await instance("/api/v1/posts/", {
         method: "get",
         params: { page, count: 25 },
       });
@@ -38,31 +38,28 @@ export const setCards = (
   };
 };
 
-export const filterCards = (
-  value: string
+export const getMyCards = (
+  page: number
 ): ThunkAction<void, RootState, unknown, SetUserCardAction> => {
   return async (dispatch: AppDispatch) => {
     try {
-      const response = await instance(`/frames/?name_startswith=${value}`, {
+      const response = await instance("/api/v1/my_posts/", {
         method: "get",
-        params: { count: 25 },
+        params: { page, count: 25 },
       });
       dispatch({
-        type: GetCardsActionTypes.FILTER_CARDS,
-        payload: {
-          cards: response.data.results,
-          totalCount: response.data.total,
-        },
+        type: GetMyCardsActionTypes.SET_MY_CARDS,
+        payload: response.data.results,
+      });
+      dispatch({
+        type: GetMyCardsActionTypes.SET_MY_CARDS_TOTAL_COUNT,
+        payload: response.data.total,
       });
     } catch (e: any) {
       dispatch({
-        type: GetCardsActionTypes.SET_ERROR,
+        type: GetMyCardsActionTypes.SET_MY_CARDS_ERROR,
         payload: e.message,
       });
     }
   };
-};
-
-export const resetCards = (): ResetCardsAction => {
-  return { type: GetCardsActionTypes.RESET_CARDS };
 };

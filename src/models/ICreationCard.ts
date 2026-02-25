@@ -1,5 +1,5 @@
 export type ICreationCard = {
-  files: File[];
+  image: File;
   name: string;
   description: string;
 };

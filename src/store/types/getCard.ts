@@ -1,4 +1,4 @@
-import { IGetCard } from "@/models/IGetCard";
+import { GetCardDetailResponse } from "@/models/IGetCard";
 
 export enum GetCardActionTypes {
   GET_CARD = "GET_CARD",
@@ -8,7 +8,7 @@ export enum GetCardActionTypes {
 
 export interface GetCardAction {
   type: GetCardActionTypes.GET_CARD;
-  payload: IGetCard;
+  payload: GetCardDetailResponse;
 }
 
 export interface IsLoadingCartAction {
@@ -22,7 +22,7 @@ export interface GetErrorAction {
 }
 
 export interface CardState {
-  card: IGetCard;
+  card: GetCardDetailResponse;
   isLoading: boolean;
   error: string;
 }
