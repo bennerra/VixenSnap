@@ -1,19 +1,13 @@
 import { FC } from "react";
-import { CardSkeleton } from "@/modules/CardsSkeleton";
-import { v4 as uuid4 } from "uuid";
 
-import { CardsLayout } from "@/layouts/CardsLayout";
+import loaderGif from "@/assets/loader.gif";
 
-const Loader: FC = () => {
-  const cardsCount = [...Array(20)];
+import styles from "./styles.module.scss";
 
-  return (
-    <CardsLayout>
-      {cardsCount.map(() => (
-        <CardSkeleton key={uuid4()} />
-      ))}
-    </CardsLayout>
-  );
-};
+const Loader: FC = () => (
+  <div className={styles.loader}>
+    <img className={styles.loaderMedia} src={loaderGif} alt="Загрузка..." />
+  </div>
+);
 
 export default Loader;

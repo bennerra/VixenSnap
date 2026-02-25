@@ -7,8 +7,8 @@ import { setUserMeInfo } from "@/store/action-creators/user";
 import { Loader } from "@/ui/Loader";
 import { Header } from "@/modules/Header";
 import { CardsInfiniteScroll } from "@/modules/CardsInfiniteScroll";
-
 import { setCards } from "@/store/action-creators/getCards";
+
 import styles from "./styles.module.scss";
 
 const cx = classNames.bind(styles);
@@ -34,20 +34,22 @@ const Home: FC = () => {
   return (
     <main className={cx("home")}>
       <Header />
-      <div className={cx("container")}>
-        <div className={cx("home__cards-list")}>
-          {isLoading ? (
-            <Loader />
-          ) : (
+      <div className={cx("container", "home-container")}>
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <div className={cx("home__cards-list")}>
             <CardsInfiniteScroll
               cards={cards}
               fetchMore={fetchMoreCards}
               totalCount={totalCount}
             />
-          )}
-        </div>
+          </div>
+        )}
         {cards.length === 0 && !isLoading && (
-          <div className={cx("home__not-found")}>Карточки не найдены!</div>
+          <div className={styles.errorContainer}>
+            <div className={cx("home__not-found")}>Карточки не найдены!</div>
+          </div>
         )}
       </div>
     </main>

@@ -22,7 +22,7 @@ export const getCardsReducer = (
 ) => {
   switch (action.type) {
     case GetCardsActionTypes.SET_IS_LOADING:
-      return { ...state, isLoading: true };
+      return { ...state, isLoading: action.payload };
     case GetCardsActionTypes.SET_CARDS:
       return {
         ...state,
@@ -53,7 +53,7 @@ export const getMyCardsReducer = (
 ) => {
   switch (action.type) {
     case GetMyCardsActionTypes.SET_MY_CARDS_IS_LOADING:
-      return { ...state, isLoading: true };
+      return { ...state, isLoading: action.payload };
     case GetMyCardsActionTypes.SET_MY_CARDS:
       return {
         ...state,

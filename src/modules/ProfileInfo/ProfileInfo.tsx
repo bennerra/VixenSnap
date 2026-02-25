@@ -13,6 +13,7 @@ import { CardsInfiniteScroll } from "@/modules/CardsInfiniteScroll";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { getMyCards } from "@/store/action-creators/getCards";
 import styles from "./styles.module.scss";
+import Loader from "../../ui/Loader/Loader";
 
 const cx = classNames.bind(styles);
 
@@ -35,7 +36,11 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
   const { id } = useParams();
   const [tab, setTab] = useState(ProfileTabNames.MY_TABS);
   const [page, setPage] = useState<number>(1);
-  const { cards, totalCount } = useAppSelector((state) => state.myCards);
+  const {
+    cards,
+    totalCount,
+    isLoading: isLoadingMyCards,
+  } = useAppSelector((state) => state.myCards);
 
   useEffect(() => {
     dispatch(getMyCards(page));
@@ -50,11 +55,19 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
 
   const tabsContent = {
     [ProfileTabNames.MY_TABS]: (
-      <CardsInfiniteScroll
-        cards={cards}
-        totalCount={totalCount}
-        fetchMore={onFetchMore}
-      />
+      <div>
+        {isLoadingMyCards ? (
+          <div className={styles.loaderConainer}>
+            <Loader />
+          </div>
+        ) : (
+          <CardsInfiniteScroll
+            cards={cards}
+            totalCount={totalCount}
+            fetchMore={onFetchMore}
+          />
+        )}
+      </div>
     ),
     [ProfileTabNames.SAVED]: <div>Сохраненные карточки</div>,
   };

@@ -3,8 +3,8 @@ import classNames from "classnames/bind";
 
 import { ThemeContext } from "@/context";
 
-import { ReactComponent as LogoDesktop } from "@/assets/logo-desktop.svg";
-import { ReactComponent as Logo } from "@/assets/logo.svg";
+import { ReactComponent as LogoDesktop } from "@/assets/logo-desktop-new.svg";
+import { ReactComponent as Logo } from "@/assets/logo-new.svg";
 
 import styles from "./styles.module.scss";
 
