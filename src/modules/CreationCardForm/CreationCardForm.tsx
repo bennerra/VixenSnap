@@ -1,4 +1,4 @@
-import React, { FC, useContext } from "react";
+import React, { FC, useContext, useState } from "react";
 import classNames from "classnames/bind";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -7,14 +7,11 @@ import * as yup from "yup";
 
 import { ThemeContext } from "@/context";
 import { ICreationCard } from "@/models/ICreationCard";
-import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { clearFileForm, uploadFile } from "@/store/action-creators/uploadFiles";
-import { creationCard } from "@/api/creationCard";
-
 import { ReactComponent as Upload } from "@/assets/upload.svg";
 import { Input } from "@/ui/Input";
 import { Button } from "@/ui/Button";
 import { ImagesPreview } from "@/modules/CreationCardForm/components/ImagesPreview";
+import { useCreationCardMutation } from "@/store/api/CardsApi";
 
 import styles from "./styles.module.scss";
 
@@ -33,9 +30,9 @@ const CreationCardForm: FC = () => {
   } = useForm<ICreationCard>({
     resolver: yupResolver(schema) as any,
   });
-  const dispatch = useAppDispatch();
-  const files = useAppSelector((state) => state.files.uploadedFiles);
+  const [files, setFiles] = useState<File[]>([]);
   const navigate = useNavigate();
+  const [createCard] = useCreationCardMutation();
 
   const onSubmit: SubmitHandler<ICreationCard> = async (data) => {
     const sendData = new FormData();
@@ -44,8 +41,7 @@ const CreationCardForm: FC = () => {
     files.forEach((el: File) => {
       sendData.append("image", el);
     });
-    await creationCard(sendData);
-    dispatch(clearFileForm());
+    await createCard(sendData).unwrap();
     navigate("/");
   };
 
@@ -56,9 +52,14 @@ const CreationCardForm: FC = () => {
         return !files.find((item) => item.name === file.name);
       });
       if (filterArr.length + files.length <= 15) {
-        dispatch(uploadFile(filterArr));
+        setFiles((prev) => [...prev, ...filterArr]);
       }
     }
+  };
+
+  const onDeleteFile = (file: string) => {
+    const filteredFiles = files.filter((item) => item.name !== file);
+    setFiles(filteredFiles);
   };
 
   return (
@@ -73,12 +74,12 @@ const CreationCardForm: FC = () => {
             {...register("image")}
             className={cx("upload__input")}
             type="file"
-            multiple={false}
+            multiple
             onChange={onImageChange}
             accept=".png, .jpg, .gif, .jpeg, .bmp, .webp, .svg"
           />
         </div>
-        <ImagesPreview files={files} />
+        <ImagesPreview files={files} onDeleteFile={onDeleteFile} />
       </div>
       <div className={cx("creation-card__description", "description")}>
         <form

@@ -1,12 +1,11 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import classNames from "classnames/bind";
 import { Link } from "react-router-dom";
-
-import { setLike } from "@/api/like";
 
 import { ReactComponent as Like } from "@/assets/likes-filled.svg";
 import { ReactComponent as EmptyLike } from "@/assets/empty-like.svg";
 import { ReactComponent as Favourites } from "@/assets/favourites.svg";
+import { useSetLikeToCardMutation } from "@/store/api/CardsApi";
 
 import styles from "./styles.module.scss";
 
@@ -17,27 +16,23 @@ interface ImageCardProps {
   title: string;
   likes: number;
   id: string;
-  is_liked: boolean;
+  isLiked: boolean;
 }
 
-const ImageCard: FC<ImageCardProps> = ({ img, title, likes, id, is_liked }) => {
-  const [isLiked, setIsLiked] = useState(false);
-  const [countLike, setCountLike] = useState(0);
+const ImageCard: FC<ImageCardProps> = (props) => {
+  const { img, title, likes, id, isLiked } = props;
+  const [setLike] = useSetLikeToCardMutation();
+  const [hasLike, setHasLike] = useState<boolean>(isLiked);
+  const [quantityLikes, setQuantityLikes] = useState<number>(likes);
 
-  useEffect(() => {
-    setIsLiked(is_liked);
-    setCountLike(likes);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleIsLiked = () => {
-    setIsLiked(!isLiked);
-    if (isLiked) {
-      setCountLike(countLike - 1);
-    } else {
-      setCountLike(countLike + 1);
+  const handleSetLike = async () => {
+    try {
+      const response = await setLike({ id }).unwrap();
+      setHasLike(response.is_liked);
+      setQuantityLikes(response.count);
+    } catch (e) {
+      console.log(e);
     }
-    setLike(id);
   };
 
   return (
@@ -52,12 +47,12 @@ const ImageCard: FC<ImageCardProps> = ({ img, title, likes, id, is_liked }) => {
               className={cx("card-bottom__likes", "bottom-likes")}
             >
               <div
-                onClick={handleIsLiked}
+                onClick={handleSetLike}
                 className={cx("bottom-likes__image")}
               >
-                {isLiked ? <Like /> : <EmptyLike />}
+                {hasLike ? <Like /> : <EmptyLike />}
               </div>
-              {countLike}
+              {quantityLikes}
             </div>
           </div>
           <div className={cx("card-bottom__save", "card-save")}>

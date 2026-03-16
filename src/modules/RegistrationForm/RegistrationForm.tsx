@@ -4,13 +4,14 @@ import classNames from "classnames/bind";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-import { loginUser, registrationUser } from "@/store/action-creators/auth";
 import { IRegistrationForm } from "@/models/IRegistrationForm";
-import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { ThemeContext } from "@/context";
 import { AuthButtonsList } from "@/modules/AuthButtonsList";
-
 import { Input } from "@/ui/Input";
+import { useLoginMutation, useRegistrationMutation } from "@/store/api/AuthApi";
+import { LocalStorageNames } from "@/constants/localeStorage";
+import { cookies, CookiesNames } from "@/constants/cookies";
+import { AppRoutes } from "@/constants/paths";
 
 import styles from "./styles.module.scss";
 
@@ -19,37 +20,46 @@ const cx = classNames.bind(styles);
 const schema = yup
   .object()
   .shape({
-    username: yup.string().required().min(8),
-    password: yup.string().required().min(8),
-    email: yup.string().required().email(),
-    name: yup.string().required(),
+    username: yup
+      .string()
+      .required("Это обязательное поле!")
+      .min(8, "Поле должно быть не меньше 8 символов"),
+    password: yup.string().required("Это обязательное поле!").min(8),
+    email: yup
+      .string()
+      .required("Это обязательное поле!")
+      .email("Некорректный email"),
+    name: yup.string().required("Это обязательное поле!"),
   })
   .required();
 
 const RegistrationForm: FC = () => {
   const { theme } = useContext(ThemeContext);
-  const dispatch = useAppDispatch();
   const {
     handleSubmit,
     register,
     formState: { errors },
   } = useForm<IRegistrationForm>({
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema),
   });
-  const { registrationError } = useAppSelector((state) => state.error);
-  const requestErrors = Object.values(registrationError).flat();
+  const [registrationUser, { error: registrationErrors }] =
+    useRegistrationMutation();
+  const [loginUser] = useLoginMutation();
+  const error = registrationErrors as any;
 
   const onSubmit: SubmitHandler<IRegistrationForm> = async (data) => {
     try {
-      const res = await dispatch(registrationUser(data));
-      if (res?.status === 201) {
-        await dispatch(
-          loginUser({
-            username: data.username || data.email,
-            password: data.password,
-          }) as any
-        );
-      }
+      await registrationUser(data).unwrap();
+      const loginResponse = await loginUser({
+        username: data.username || data.email,
+        password: data.password,
+      }).unwrap();
+
+      localStorage.setItem(LocalStorageNames.AUTH, loginResponse.access);
+      cookies.set(CookiesNames.AUTH, loginResponse.refresh, {
+        expires: new Date(Date.now() + 86400000),
+      });
+      window.location.href = AppRoutes.MAIN;
     } catch (e) {
       console.error(e);
     }
@@ -60,63 +70,63 @@ const RegistrationForm: FC = () => {
       <div className={cx("registration-form__input")}>
         <Input
           {...register("username")}
-          cancelled={!!registrationError}
+          cancelled={!!error?.data?.username?.length}
           theme={theme}
           placeholder="Имя пользователя *"
           error={errors?.username?.message}
         />
-        {errors?.username?.message && (
+        {!!error?.data?.username?.length && (
           <div className={cx("registration-form__error")}>
-            {errors?.username?.message}
+            {error?.data?.username[0]}
           </div>
         )}
       </div>
       <div className={cx("registration-form__input")}>
         <Input
           {...register("password")}
-          cancelled={!!registrationError}
+          cancelled={!!error?.data?.password?.length}
           theme={theme}
           placeholder="Пароль *"
           type="password"
           error={errors?.password?.message}
         />
-        {errors?.password?.message && (
+        {!!error?.data?.password?.length && (
           <div className={cx("registration-form__error")}>
-            {errors?.password?.message}
+            {error?.data?.password[0]}
           </div>
         )}
       </div>
       <div className={cx("registration-form__input")}>
         <Input
           {...register("email")}
-          cancelled={!!registrationError}
+          cancelled={!!error?.data?.email?.length}
           theme={theme}
           placeholder="E-mail *"
           type="email"
           error={errors?.email?.message}
         />
-        {errors?.email?.message && (
+        {!!error?.data?.email?.length && (
           <div className={cx("registration-form__error")}>
-            {errors?.email?.message}
+            {error?.data?.email[0]}
           </div>
         )}
       </div>
       <div className={cx("registration-form__input")}>
         <Input
           {...register("name")}
-          cancelled={!!registrationError}
+          cancelled={!!error?.data?.name?.length}
           theme={theme}
           placeholder="Имя *"
           error={errors?.name?.message}
         />
-        {errors?.name?.message && (
+        {!!error?.data?.name?.length && (
           <div className={cx("registration-form__error")}>
-            {errors?.name?.message}
+            {error?.data?.name[0]}
           </div>
         )}
       </div>
-      {!!requestErrors.length &&
-        requestErrors.map((item) => (
+      {!!error?.data?.non_field_errors?.length &&
+        !!error?.data?.non_field_errors.map((item: string) => (
           <div key={item} className={cx("registration-form__error")}>
             {item}
           </div>

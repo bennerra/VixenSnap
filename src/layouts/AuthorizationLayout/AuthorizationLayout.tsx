@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 import { ThemeContext } from "@/context";
 
-import { ReactComponent as Logo } from "@/assets/logo-desktop.svg";
+import { ReactComponent as Logo } from "@/assets/logo-desktop-new.svg";
 
 import styles from "./styles.module.scss";
 

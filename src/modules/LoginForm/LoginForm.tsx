@@ -4,13 +4,15 @@ import * as yup from "yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-import { loginUser } from "@/store/action-creators/auth";
 import { ThemeContext } from "@/context";
-import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { ILoginForm } from "@/models/ILoginForm";
 
 import { Input } from "@/ui/Input";
 import { AuthButtonsList } from "@/modules/AuthButtonsList";
+import { useLoginMutation } from "@/store/api/AuthApi";
+import { LocalStorageNames } from "@/constants/localeStorage";
+import { cookies, CookiesNames } from "@/constants/cookies";
+import { AppRoutes } from "@/constants/paths";
 
 import styles from "./styles.module.scss";
 
@@ -26,7 +28,6 @@ const schema = yup
 
 const LoginForm: FC = () => {
   const { theme } = useContext(ThemeContext);
-  const dispatch = useAppDispatch();
   const {
     handleSubmit,
     register,
@@ -34,10 +35,15 @@ const LoginForm: FC = () => {
   } = useForm<ILoginForm>({
     resolver: yupResolver(schema) as any,
   });
-  const { loginError } = useAppSelector((state) => state.error);
+  const [trigger, { isError }] = useLoginMutation();
 
   const onSubmit: SubmitHandler<ILoginForm> = async (data) => {
-    await dispatch(loginUser(data) as any);
+    const response = await trigger(data).unwrap();
+    localStorage.setItem(LocalStorageNames.AUTH, response.access);
+    cookies.set(CookiesNames.AUTH, response.refresh, {
+      expires: new Date(Date.now() + 86400000),
+    });
+    window.location.href = AppRoutes.MAIN;
   };
 
   return (
@@ -46,7 +52,7 @@ const LoginForm: FC = () => {
         <Input
           {...register("username")}
           theme={theme}
-          cancelled={!!loginError}
+          cancelled={isError}
           placeholder="Логин или e-mail"
           error={errors?.username?.message}
         />
@@ -60,7 +66,7 @@ const LoginForm: FC = () => {
         <Input
           {...register("password")}
           theme={theme}
-          cancelled={!!loginError}
+          cancelled={isError}
           placeholder="Пароль"
           type="password"
           error={errors?.password?.message}
@@ -71,7 +77,7 @@ const LoginForm: FC = () => {
           </div>
         )}
       </div>
-      {loginError && (
+      {isError && (
         <div className={cx("login-form__error")}>Неверный логин или пароль</div>
       )}
       <AuthButtonsList text="Войти" />

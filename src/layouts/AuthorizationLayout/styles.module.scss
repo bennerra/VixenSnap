@@ -45,10 +45,10 @@
     width: 100%;
     height: 40%;
     min-height: 200px;
-    background: linear-gradient(180deg, $color-bg-auth 0%, rgba(238, 188, 167, 0.00) 81.71%);
+    background: linear-gradient(180deg, #e7c3ff 0%, #ffffff 81.71%);
     transition: all 0.3s ease-in-out;
     &-dark {
-      background: linear-gradient(180deg, #6D422F 0%, #2C2C2C 81.71%);
+      background: linear-gradient(180deg, #c68dfe 0%, rgba(198, 141, 254, 0.00) 81.71%);
     }
   }
   &__logo {

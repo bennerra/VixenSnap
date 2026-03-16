@@ -2,13 +2,15 @@ import { FC, useContext } from "react";
 import classNames from "classnames/bind";
 
 import { ThemeContext } from "@/context";
-import { deleteUserToken } from "@/utils/deleteUserToken";
-import { useAppDispatch } from "@/hooks/redux";
 
 import { ReactComponent as Profile } from "@/assets/profile.svg";
 import { ReactComponent as Theme } from "@/assets/theme.svg";
 import { ReactComponent as Exit } from "@/assets/exit.svg";
 import { ProfileItem } from "@/modules/Header/Components/ProfileItem";
+import { useLogoutMutation } from "@/store/api/AuthApi";
+import { cookies, CookiesNames } from "@/constants/cookies";
+import { LocalStorageNames } from "@/constants/localeStorage";
+import { AppRoutes } from "@/constants/paths";
 
 import styles from "./styles.module.scss";
 
@@ -16,10 +18,18 @@ const cx = classNames.bind(styles);
 
 const ProfileDropDown: FC = () => {
   const { toggleTheme, theme } = useContext(ThemeContext);
-  const dispatch = useAppDispatch();
+  const [logoutUser] = useLogoutMutation();
 
-  const deleteHandler = () => {
-    deleteUserToken(dispatch);
+  const deleteHandler = async () => {
+    try {
+      const refreshToken = cookies.get(CookiesNames.AUTH);
+      await logoutUser({ refresh_token: refreshToken }).unwrap();
+      localStorage.removeItem(LocalStorageNames.AUTH);
+      cookies.remove(CookiesNames.AUTH);
+      window.location.href = AppRoutes.AUTH;
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (

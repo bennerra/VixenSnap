@@ -6,7 +6,7 @@ export type IGetCard = {
   owner_id: string;
   short_url: string;
   description: string;
-  likes: number;
+  likes_count: number;
   is_liked: boolean;
   attachments: IAttachment[];
 };
@@ -17,7 +17,7 @@ export type GetCardDetailResponse = {
   owner_id: string;
   short_url: string;
   description: string;
-  likes: number;
+  likes_count: number;
   is_liked: boolean;
   author_name: string;
   author_id: string;

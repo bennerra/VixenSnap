@@ -5,9 +5,7 @@ import Masonry from "react-responsive-masonry";
 
 import { IGetCards } from "@/models/IGetCards";
 import { setColumns } from "@/utils/setColumns";
-
 import { ImageCard } from "@/modules/ImageCard";
-import { Loader } from "@/ui/Loader";
 import { useResize } from "@/hooks/useResize";
 
 type Props = {
@@ -24,7 +22,7 @@ const CardsInfiniteScroll: FC<Props> = (props) => {
     <InfiniteScroll
       next={fetchMore}
       hasMore={totalCount >= 25}
-      loader={<Loader />}
+      loader={null}
       dataLength={cards.length}
     >
       <Masonry columnsCount={setColumns(width)} gutter="10px">
@@ -33,9 +31,9 @@ const CardsInfiniteScroll: FC<Props> = (props) => {
             key={uuid4()}
             img={card.short_url}
             title={card.name}
-            likes={card.likes}
+            likes={card.likes_count}
             id={card.id}
-            is_liked={card.is_liked}
+            isLiked={card.is_liked}
           />
         ))}
       </Masonry>

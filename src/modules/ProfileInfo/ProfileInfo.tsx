@@ -10,8 +10,11 @@ import { IUser } from "@/models/IUser";
 import { NotificationContext } from "@/context/NotificationContext";
 import { ProfileTabNames, profileTabs } from "@/modules/ProfileInfo/constants";
 import { CardsInfiniteScroll } from "@/modules/CardsInfiniteScroll";
-import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { getMyCards } from "@/store/action-creators/getCards";
+import {
+  useLazyGetMyCardsQuery,
+  useLazyGetUserCardsQuery,
+} from "@/store/api/CardsApi";
+import { IGetCards } from "@/models/IGetCards";
 import styles from "./styles.module.scss";
 import Loader from "../../ui/Loader/Loader";
 
@@ -28,7 +31,6 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
   subscription = "0",
   user,
 }) => {
-  const dispatch = useAppDispatch();
   const { showNotification } = useContext(NotificationContext);
   const { theme } = useContext(ThemeContext);
   const { avatar, name, username } = user;
@@ -36,28 +38,54 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
   const { id } = useParams();
   const [tab, setTab] = useState(ProfileTabNames.MY_TABS);
   const [page, setPage] = useState<number>(1);
-  const {
-    cards,
-    totalCount,
-    isLoading: isLoadingMyCards,
-  } = useAppSelector((state) => state.myCards);
+  const [getMyCards, { isLoading: isLoadingMyCards }] = useLazyGetMyCardsQuery(
+    {}
+  );
+  const [getCards, { isLoading: isLoadingCards }] = useLazyGetUserCardsQuery(
+    {}
+  );
+  const [cards, setCards] = useState<IGetCards[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const methodGetCards = id ? getCards : getMyCards;
+  const isLoading = id ? isLoadingCards : isLoadingMyCards;
 
   useEffect(() => {
-    dispatch(getMyCards(page));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const fetchCards = async () => {
+      try {
+        const payload = {
+          page,
+          id: id || "",
+        };
+        const response = await methodGetCards(payload).unwrap();
+        setCards([...response.results]);
+        setTotalCount(response.count);
+      } catch (e) {
+        console.log(e);
+      }
+    };
 
-  const onFetchMore = () => {
+    fetchCards();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  const onFetchMore = async () => {
+    if (cards.length === totalCount) return;
+
+    const payload = {
+      page,
+      id: id || "",
+    };
     const nextPage = page + 1;
-    getMyCards(nextPage);
+    const response = await methodGetCards(payload).unwrap();
+    setCards((prev) => [...prev, ...response.results]);
     setPage(nextPage);
   };
 
   const tabsContent = {
     [ProfileTabNames.MY_TABS]: (
       <div>
-        {isLoadingMyCards ? (
-          <div className={styles.loaderConainer}>
+        {isLoading ? (
+          <div className={styles.loaderContainer}>
             <Loader />
           </div>
         ) : (

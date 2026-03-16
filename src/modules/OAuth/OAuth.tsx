@@ -4,11 +4,11 @@ import { Navigate } from "react-router-dom";
 
 import { useAppDispatch } from "@/hooks/redux";
 import { getUserData } from "@/utils/getUserData";
-import { oAuthUser } from "@/api/oAuth";
 import { ThemeContext } from "@/context";
-
 import { IOAuthUser } from "@/models/IOAuthUser";
 import { LocalStorageNames } from "@/constants/localeStorage";
+import { useOAuthUserMutation } from "@/store/api/AuthApi";
+
 import styles from "./styles.module.scss";
 
 const cx = classNames.bind(styles);
@@ -17,13 +17,17 @@ const OAuth: FC = () => {
   const dispatch = useAppDispatch();
   const { theme } = useContext(ThemeContext);
   const isAuth = !!localStorage.getItem(LocalStorageNames.AUTH);
+  const [oAuthUser] = useOAuthUserMutation();
 
   const url = window.location.hash;
   const userData = getUserData(url);
 
-  const setIsAuth = useCallback(async (user: IOAuthUser) => {
-    await oAuthUser(user);
-  }, []);
+  const setIsAuth = useCallback(
+    async (user: IOAuthUser) => {
+      await oAuthUser(user).unwrap();
+    },
+    [oAuthUser]
+  );
 
   useEffect(() => {
     setIsAuth(userData);

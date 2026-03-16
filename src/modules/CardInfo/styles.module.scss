@@ -74,11 +74,6 @@
   &-dark {
     color: $light-gray-hover;
   }
-  &__name {
-    cursor: pointer;
-    font-weight: 400;
-    margin-bottom: 10px;
-  }
   &__title {
     font-weight: 600;
     font-size: 18px;
@@ -139,4 +134,5 @@
 .card_author {
   color: $light-gray-hover;
   font-size: 18px;
+  margin-bottom: 15px;
 }

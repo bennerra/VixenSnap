@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect } from "react";
+import { FC, useContext } from "react";
 import classNames from "classnames/bind";
 import { Route, Routes, useLocation } from "react-router-dom";
 
@@ -12,22 +12,15 @@ import { Profile } from "@/pages/Profile";
 import { Card } from "@/pages/Card";
 import { OAuth } from "@/modules/OAuth";
 import { AppRoutes } from "@/constants/paths";
-
 import { NavigateRouter } from "@/layouts/NavigateRouter/NavigateRouter";
-import { useAppDispatch } from "@/hooks/redux";
-import { setUserMeInfo } from "@/store/action-creators/user";
+
 import styles from "./styles.module.scss";
 
 const cx = classNames.bind(styles);
 
 const App: FC = () => {
-  const dispatch = useAppDispatch();
   const { theme } = useContext(ThemeContext);
   const { pathname } = useLocation();
-
-  useEffect(() => {
-    dispatch(setUserMeInfo());
-  }, [dispatch]);
 
   return (
     <NavigateRouter currentPage={pathname as AppRoutes}>

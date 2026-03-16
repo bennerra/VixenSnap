@@ -1,9 +1,6 @@
 import { FC } from "react";
 import classNames from "classnames/bind";
 
-import { deleteFile } from "@/store/action-creators/uploadFiles";
-import { useAppDispatch } from "@/hooks/redux";
-
 import { ReactComponent as Delete } from "@/assets/cross.svg";
 
 import styles from "./styles.module.scss";
@@ -12,15 +9,10 @@ const cx = classNames.bind(styles);
 
 interface ImagesPreviewProps {
   files: File[];
+  onDeleteFile: (file: string) => void;
 }
 
-const ImagesPreview: FC<ImagesPreviewProps> = ({ files }) => {
-  const dispatch = useAppDispatch();
-
-  const removeImage = (file: string) => {
-    dispatch(deleteFile(file));
-  };
-
+const ImagesPreview: FC<ImagesPreviewProps> = ({ files, onDeleteFile }) => {
   return (
     <div className={cx("creation-card__images", "images")}>
       {files.map((file) => {
@@ -29,7 +21,7 @@ const ImagesPreview: FC<ImagesPreviewProps> = ({ files }) => {
           <div key={file.name} className={cx("images__item", "images-item")}>
             <img className={cx("images-item__picture")} src={src} alt="" />
             <div
-              onClick={() => removeImage(file.name)}
+              onClick={() => onDeleteFile(file.name)}
               className={cx("images-item__close")}
             >
               <Delete />
