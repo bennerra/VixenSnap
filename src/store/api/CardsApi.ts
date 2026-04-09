@@ -4,11 +4,11 @@ import { baseQueryWithReauth } from "@/store/baseQueryWithReauth";
 export const cardsApi = createApi({
   reducerPath: "cardsApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Cards"],
+  tagTypes: ["Cards", "SavedCards"],
   endpoints: (builder) => ({
-    getCards: builder.query<any, { page: number }>({
-      query: ({ page }) => ({
-        url: `posts?page=${page}`,
+    getCards: builder.query<any, { page: number; searchValue: string }>({
+      query: ({ page, searchValue }) => ({
+        url: `posts?page=${page}&searchValue=${searchValue}`,
         method: "GET",
       }),
       providesTags: ["Cards"],
@@ -47,6 +47,27 @@ export const cardsApi = createApi({
       }),
       invalidatesTags: ["Cards"],
     }),
+    saveCard: builder.mutation<any, { id: string }>({
+      query: (credentials) => ({
+        url: `posts/save/${credentials.id}/`,
+        method: "POST",
+      }),
+      invalidatesTags: ["SavedCards"],
+    }),
+    getMySavedCards: builder.query<any, { page: number }>({
+      query: ({ page }) => ({
+        url: `saved_posts?page=${page}`,
+        method: "GET",
+      }),
+      providesTags: ["SavedCards"],
+    }),
+    getUserSavedCards: builder.query<any, { page: number; id: string }>({
+      query: ({ page, id }) => ({
+        url: `saved_posts/${id}?page=${page}`,
+        method: "GET",
+      }),
+      providesTags: ["SavedCards"],
+    }),
   }),
 });
 
@@ -57,4 +78,7 @@ export const {
   useSetLikeToCardMutation,
   useGetCardQuery,
   useCreationCardMutation,
+  useSaveCardMutation,
+  useLazyGetMySavedCardsQuery,
+  useLazyGetUserSavedCardsQuery,
 } = cardsApi;

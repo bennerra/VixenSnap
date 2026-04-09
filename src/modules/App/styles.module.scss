@@ -1,7 +1,7 @@
 @import "../../variables";
 
 .App {
-  background-color: $color-white;
+  background-color: #f9fafb;;
   transition: all 0.3s ease-in-out;
   &-dark {
     background-color: $grey-umber;

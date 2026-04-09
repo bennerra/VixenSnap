@@ -7,11 +7,10 @@ import * as yup from "yup";
 
 import { ThemeContext } from "@/context";
 import { ICreationCard } from "@/models/ICreationCard";
-import { ReactComponent as Upload } from "@/assets/upload.svg";
 import { Input } from "@/ui/Input";
 import { Button } from "@/ui/Button";
-import { ImagesPreview } from "@/modules/CreationCardForm/components/ImagesPreview";
 import { useCreationCardMutation } from "@/store/api/CardsApi";
+import { FileInput } from "@/ui/FileInput/FileInput";
 
 import styles from "./styles.module.scss";
 
@@ -64,23 +63,16 @@ const CreationCardForm: FC = () => {
 
   return (
     <div className={cx("creation-card")}>
-      <div className={cx("creation-card__left")}>
-        <div className={cx("creation-card__upload", "upload")}>
-          <div className={cx("upload__icon")}>
-            <Upload />
-          </div>
-          <div className={cx("upload__text")}>Загрузите файлы</div>
-          <input
-            {...register("image")}
-            className={cx("upload__input")}
-            type="file"
-            multiple
-            onChange={onImageChange}
-            accept=".png, .jpg, .gif, .jpeg, .bmp, .webp, .svg"
-          />
-        </div>
-        <ImagesPreview files={files} onDeleteFile={onDeleteFile} />
-      </div>
+      <FileInput
+        register={register}
+        name="image"
+        isMultiple
+        onChange={onImageChange}
+        onDeleteFile={onDeleteFile}
+        isFilesPreview
+        files={files}
+        accept=".png, .jpg, .gif, .jpeg, .bmp, .webp, .svg"
+      />
       <div className={cx("creation-card__description", "description")}>
         <form
           onSubmit={handleSubmit(onSubmit)}

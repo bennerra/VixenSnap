@@ -21,7 +21,7 @@ const Card: FC = () => {
       <Header />
       <div className={cx("container")}>
         <div className={cx("card__content")}>
-          {isLoading || !card.id ? (
+          {isLoading || !card?.id ? (
             <CardSkeleton />
           ) : (
             <CardInfo
@@ -33,6 +33,7 @@ const Card: FC = () => {
               id={card.id}
               author_name={card.author_name}
               author_id={card.author_id}
+              isSave={card.is_save}
             />
           )}
         </div>

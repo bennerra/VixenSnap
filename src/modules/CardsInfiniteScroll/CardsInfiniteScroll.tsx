@@ -1,6 +1,5 @@
 import { FC } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { v4 as uuid4 } from "uuid";
 import Masonry from "react-responsive-masonry";
 
 import { IGetCards } from "@/models/IGetCards";
@@ -28,12 +27,13 @@ const CardsInfiniteScroll: FC<Props> = (props) => {
       <Masonry columnsCount={setColumns(width)} gutter="10px">
         {cards.map((card: IGetCards) => (
           <ImageCard
-            key={uuid4()}
+            key={card.id}
             img={card.short_url}
             title={card.name}
             likes={card.likes_count}
             id={card.id}
             isLiked={card.is_liked}
+            isSave={card.is_saved}
           />
         ))}
       </Masonry>

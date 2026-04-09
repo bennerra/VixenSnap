@@ -7,6 +7,7 @@ export const enum AppRoutes {
   PROFILE = "/profile/:id",
   PROFILE_ME = "/profile/me",
   CARD_DETAIL = "/card/:id",
+  PROFILE_EDIT = "/profile/edit",
 }
 
 export const NotAuthPaths: AppRoutes[] = [
@@ -20,4 +21,5 @@ export const AuthRoutes: AppRoutes[] = [
   AppRoutes.PROFILE,
   AppRoutes.CARD_DETAIL,
   AppRoutes.CREATION,
+  AppRoutes.PROFILE_EDIT,
 ];

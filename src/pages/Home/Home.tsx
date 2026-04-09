@@ -16,11 +16,13 @@ const Home: FC = () => {
   const [getCards, { isLoading }] = useLazyGetCardsQuery();
   const [cards, setCards] = useState<IGetCards[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const [searchValue, setSearchValue] = useState<string>("");
 
   useEffect(() => {
     const fetchCards = async () => {
       try {
-        const response = await getCards({ page }).unwrap();
+        setPage(1);
+        const response = await getCards({ page: 1, searchValue }).unwrap();
         setCards([...response.results]);
         setTotalCount(response.count);
       } catch (e) {
@@ -30,16 +32,16 @@ const Home: FC = () => {
 
     fetchCards();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchValue]);
 
   const fetchMoreCards = useCallback(async () => {
     if (cards.length === totalCount) return;
 
     const nextPage = page + 1;
-    const response = await getCards({ page: nextPage }).unwrap();
+    const response = await getCards({ page: nextPage, searchValue }).unwrap();
     setCards((prev) => [...prev, ...response.results]);
     setPage(nextPage);
-  }, [cards.length, totalCount, page, getCards]);
+  }, [cards.length, totalCount, page, getCards, searchValue]);
 
   const content =
     cards.length === 0 ? (
@@ -60,7 +62,11 @@ const Home: FC = () => {
 
   return (
     <main className={cx("home")}>
-      <Header />
+      <Header
+        searchValue={searchValue}
+        setSearchValue={setSearchValue}
+        isSearch
+      />
       {isLoading ? <Loader /> : content}
     </main>
   );

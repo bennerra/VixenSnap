@@ -5,18 +5,22 @@ import { ThemeContext } from "@/context";
 import { Button } from "@/ui/Button";
 import { useResize } from "@/hooks/useResize";
 
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { IUser } from "@/models/IUser";
 import { NotificationContext } from "@/context/NotificationContext";
 import { ProfileTabNames, profileTabs } from "@/modules/ProfileInfo/constants";
 import { CardsInfiniteScroll } from "@/modules/CardsInfiniteScroll";
 import {
   useLazyGetMyCardsQuery,
+  useLazyGetMySavedCardsQuery,
   useLazyGetUserCardsQuery,
+  useLazyGetUserSavedCardsQuery,
 } from "@/store/api/CardsApi";
 import { IGetCards } from "@/models/IGetCards";
-import styles from "./styles.module.scss";
+import { AppRoutes } from "@/constants/paths";
 import Loader from "../../ui/Loader/Loader";
+
+import styles from "./styles.module.scss";
 
 const cx = classNames.bind(styles);
 
@@ -38,16 +42,30 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
   const { id } = useParams();
   const [tab, setTab] = useState(ProfileTabNames.MY_TABS);
   const [page, setPage] = useState<number>(1);
+  const [pageSavedCards, setPageSavedCards] = useState<number>(1);
   const [getMyCards, { isLoading: isLoadingMyCards }] = useLazyGetMyCardsQuery(
     {}
   );
   const [getCards, { isLoading: isLoadingCards }] = useLazyGetUserCardsQuery(
     {}
   );
+  const [getMySavedCards, { isLoading: isLoadingMySavedCards }] =
+    useLazyGetMySavedCardsQuery({});
+  const [getSavedCards, { isLoading: isLoadingSavedCards }] =
+    useLazyGetUserSavedCardsQuery({});
   const [cards, setCards] = useState<IGetCards[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const [savedCards, setSavedCards] = useState<IGetCards[]>([]);
+  const [savedTotalCount, setSavedTotalCount] = useState<number>(0);
   const methodGetCards = id ? getCards : getMyCards;
+  const methodGetSavedCards = id ? getSavedCards : getMySavedCards;
   const isLoading = id ? isLoadingCards : isLoadingMyCards;
+  const isLoadingSaved = id ? isLoadingSavedCards : isLoadingMySavedCards;
+  const navigate = useNavigate();
+
+  const navigateToProfileEdit = () => {
+    navigate(AppRoutes.PROFILE_EDIT);
+  };
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -64,7 +82,22 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
       }
     };
 
+    const fetchSavedCards = async () => {
+      try {
+        const payload = {
+          page: pageSavedCards,
+          id: id || "",
+        };
+        const response = await methodGetSavedCards(payload).unwrap();
+        setSavedCards([...response.results]);
+        setSavedTotalCount(response.count);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+
     fetchCards();
+    fetchSavedCards();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -81,6 +114,19 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
     setPage(nextPage);
   };
 
+  const onFetchMoreSavedCards = async () => {
+    if (savedCards.length === savedTotalCount) return;
+
+    const payload = {
+      page: pageSavedCards,
+      id: id || "",
+    };
+    const nextPage = pageSavedCards + 1;
+    const response = await methodGetSavedCards(payload).unwrap();
+    setSavedCards((prev) => [...prev, ...response.results]);
+    setPageSavedCards(nextPage);
+  };
+
   const tabsContent = {
     [ProfileTabNames.MY_TABS]: (
       <div>
@@ -89,15 +135,41 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
             <Loader />
           </div>
         ) : (
-          <CardsInfiniteScroll
-            cards={cards}
-            totalCount={totalCount}
-            fetchMore={onFetchMore}
-          />
+          <div>
+            {cards.length ? (
+              <CardsInfiniteScroll
+                cards={cards}
+                totalCount={totalCount}
+                fetchMore={onFetchMore}
+              />
+            ) : (
+              <div className={styles.loaderContainer}>Посты не найдены</div>
+            )}
+          </div>
         )}
       </div>
     ),
-    [ProfileTabNames.SAVED]: <div>Сохраненные карточки</div>,
+    [ProfileTabNames.SAVED]: (
+      <div>
+        {isLoadingSaved ? (
+          <div className={styles.loaderContainer}>
+            <Loader />
+          </div>
+        ) : (
+          <div>
+            {savedCards.length ? (
+              <CardsInfiniteScroll
+                cards={savedCards}
+                totalCount={savedTotalCount}
+                fetchMore={onFetchMoreSavedCards}
+              />
+            ) : (
+              <div className={styles.loaderContainer}>Посты не найдены</div>
+            )}
+          </div>
+        )}
+      </div>
+    ),
   };
 
   const onShareLink = () => {
@@ -134,6 +206,7 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
             color="white"
             theme={theme}
             size={width < 992 ? "small" : "medium"}
+            onClick={navigateToProfileEdit}
           />
         )}
         <Button

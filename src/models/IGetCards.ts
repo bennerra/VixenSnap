@@ -7,5 +7,6 @@ export type IGetCards = {
   preview: string;
   likes_count: number;
   is_liked: boolean;
+  is_saved: boolean;
   author: string;
 };

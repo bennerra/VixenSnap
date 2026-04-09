@@ -13,6 +13,7 @@ import { Card } from "@/pages/Card";
 import { OAuth } from "@/modules/OAuth";
 import { AppRoutes } from "@/constants/paths";
 import { NavigateRouter } from "@/layouts/NavigateRouter/NavigateRouter";
+import { ProfileEdit } from "@/pages/ProfileEdit/ProfileEdit";
 
 import styles from "./styles.module.scss";
 
@@ -30,6 +31,7 @@ const App: FC = () => {
           <Route path={AppRoutes.CREATION} element={<CreationCard />} />
           <Route path={AppRoutes.PROFILE} element={<Profile />} />
           <Route path={AppRoutes.PROFILE_ME} element={<Profile />} />
+          <Route path={AppRoutes.PROFILE_EDIT} element={<ProfileEdit />} />
           <Route path={AppRoutes.CARD_DETAIL} element={<Card />} />
           <Route path={AppRoutes.REGISTRATION} element={<Registration />} />
           <Route path={AppRoutes.AUTH} element={<Login />} />

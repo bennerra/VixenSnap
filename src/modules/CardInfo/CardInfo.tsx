@@ -7,7 +7,10 @@ import { Button } from "@/ui/Button";
 import { ReactComponent as Like } from "@/assets/likes-filled.svg";
 import { ReactComponent as EmptyLike } from "@/assets/empty-like.svg";
 import { useGetUserQuery } from "@/store/api/UsersApi";
-import { useSetLikeToCardMutation } from "@/store/api/CardsApi";
+import {
+  useSaveCardMutation,
+  useSetLikeToCardMutation,
+} from "@/store/api/CardsApi";
 
 import styles from "./styles.module.scss";
 
@@ -22,6 +25,7 @@ interface CardInfoProps {
   id: string;
   author_id: string;
   author_name: string;
+  isSave: boolean;
 }
 
 const CardInfo: FC<CardInfoProps> = ({
@@ -33,10 +37,13 @@ const CardInfo: FC<CardInfoProps> = ({
   id,
   author_name,
   author_id,
+  isSave,
 }) => {
   const { theme } = useContext(ThemeContext);
   const { data: user } = useGetUserQuery({ id: author_id });
   const [setLike] = useSetLikeToCardMutation();
+  const [saveCard] = useSaveCardMutation();
+  const [hasSave, setHasSave] = useState<boolean>(isSave);
   const [hasLike, setHasLike] = useState<boolean>(is_liked);
   const [quantityLikes, setQuantityLikes] = useState<number>(likes);
 
@@ -50,6 +57,15 @@ const CardInfo: FC<CardInfoProps> = ({
       const response = await setLike({ id }).unwrap();
       setHasLike(response.is_liked);
       setQuantityLikes(response.count);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      const response = await saveCard({ id }).unwrap();
+      setHasSave(response.is_saved);
     } catch (e) {
       console.log(e);
     }
@@ -87,9 +103,10 @@ const CardInfo: FC<CardInfoProps> = ({
             <div className={cx("card-save__button")}>
               <Button
                 theme={theme}
-                text="Сохранить"
-                color="orange"
+                text={hasSave ? "Сохранить" : "Сохранено"}
+                color={hasSave ? "orange" : "gray"}
                 size="medium"
+                onClick={handleSave}
               />
             </div>
             <div className={cx("card-save__likes", "card-likes")}>

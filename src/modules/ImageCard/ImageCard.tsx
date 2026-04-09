@@ -1,11 +1,15 @@
-import { FC, useState } from "react";
+import { FC, useState, MouseEvent } from "react";
 import classNames from "classnames/bind";
 import { Link } from "react-router-dom";
 
 import { ReactComponent as Like } from "@/assets/likes-filled.svg";
 import { ReactComponent as EmptyLike } from "@/assets/empty-like.svg";
 import { ReactComponent as Favourites } from "@/assets/favourites.svg";
-import { useSetLikeToCardMutation } from "@/store/api/CardsApi";
+import { ReactComponent as FavouritesFilled } from "@/assets/filled-save.svg";
+import {
+  useSaveCardMutation,
+  useSetLikeToCardMutation,
+} from "@/store/api/CardsApi";
 
 import styles from "./styles.module.scss";
 
@@ -17,19 +21,32 @@ interface ImageCardProps {
   likes: number;
   id: string;
   isLiked: boolean;
+  isSave: boolean;
 }
 
 const ImageCard: FC<ImageCardProps> = (props) => {
-  const { img, title, likes, id, isLiked } = props;
+  const { img, title, likes, id, isLiked, isSave } = props;
   const [setLike] = useSetLikeToCardMutation();
   const [hasLike, setHasLike] = useState<boolean>(isLiked);
   const [quantityLikes, setQuantityLikes] = useState<number>(likes);
+  const [saveCard] = useSaveCardMutation();
+  const [hasSave, setHasSave] = useState<boolean>(isSave);
 
   const handleSetLike = async () => {
     try {
       const response = await setLike({ id }).unwrap();
       setHasLike(response.is_liked);
       setQuantityLikes(response.count);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const handleSave = async (event: MouseEvent<HTMLDivElement>) => {
+    try {
+      event.preventDefault();
+      const response = await saveCard({ id }).unwrap();
+      setHasSave(response.is_saved);
     } catch (e) {
       console.log(e);
     }
@@ -55,10 +72,13 @@ const ImageCard: FC<ImageCardProps> = (props) => {
               {quantityLikes}
             </div>
           </div>
-          <div className={cx("card-bottom__save", "card-save")}>
+          <div
+            onClick={(e) => handleSave(e)}
+            className={cx("card-bottom__save", "card-save")}
+          >
             Сохранить
             <div className={cx("card-save__favourites")}>
-              <Favourites />
+              {hasSave ? <FavouritesFilled /> : <Favourites />}
             </div>
           </div>
         </div>
