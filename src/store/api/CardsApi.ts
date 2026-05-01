@@ -1,10 +1,11 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "@/store/baseQueryWithReauth";
+import { CommentResponse } from "@/models/IComments";
 
 export const cardsApi = createApi({
   reducerPath: "cardsApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Cards", "SavedCards"],
+  tagTypes: ["Cards", "SavedCards", "Comments"],
   endpoints: (builder) => ({
     getCards: builder.query<any, { page: number; searchValue: string }>({
       query: ({ page, searchValue }) => ({
@@ -68,6 +69,21 @@ export const cardsApi = createApi({
       }),
       providesTags: ["SavedCards"],
     }),
+    addComment: builder.mutation<any, { post: string; text: string }>({
+      query: (credentials) => ({
+        url: `comments/`,
+        method: "POST",
+        body: credentials,
+      }),
+      invalidatesTags: ["Comments"],
+    }),
+    getComments: builder.query<CommentResponse, { id: string }>({
+      query: ({ id }) => ({
+        url: `comments/?post_id=${id}`,
+        method: "GET",
+      }),
+      providesTags: ["Comments"],
+    }),
   }),
 });
 
@@ -81,4 +97,6 @@ export const {
   useSaveCardMutation,
   useLazyGetMySavedCardsQuery,
   useLazyGetUserSavedCardsQuery,
+  useAddCommentMutation,
+  useGetCommentsQuery,
 } = cardsApi;

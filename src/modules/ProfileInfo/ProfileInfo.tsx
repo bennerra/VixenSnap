@@ -18,6 +18,7 @@ import {
 } from "@/store/api/CardsApi";
 import { IGetCards } from "@/models/IGetCards";
 import { AppRoutes } from "@/constants/paths";
+import { useFollowMutation, useUnfollowMutation } from "@/store/api/UsersApi";
 import Loader from "../../ui/Loader/Loader";
 
 import styles from "./styles.module.scss";
@@ -25,19 +26,20 @@ import styles from "./styles.module.scss";
 const cx = classNames.bind(styles);
 
 interface ProfileInfoProps {
-  subscribers?: string;
-  subscription?: string;
   user: IUser;
 }
 
-const ProfileInfo: FC<ProfileInfoProps> = ({
-  subscribers = "0",
-  subscription = "0",
-  user,
-}) => {
+const ProfileInfo: FC<ProfileInfoProps> = ({ user }) => {
   const { showNotification } = useContext(NotificationContext);
   const { theme } = useContext(ThemeContext);
-  const { avatar, name, username } = user;
+  const {
+    avatar,
+    name,
+    username,
+    followers_count,
+    following_count,
+    is_following,
+  } = user;
   const { width } = useResize();
   const { id } = useParams();
   const [tab, setTab] = useState(ProfileTabNames.MY_TABS);
@@ -53,6 +55,8 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
     useLazyGetMySavedCardsQuery({});
   const [getSavedCards, { isLoading: isLoadingSavedCards }] =
     useLazyGetUserSavedCardsQuery({});
+  const [follow] = useFollowMutation();
+  const [unfollow] = useUnfollowMutation();
   const [cards, setCards] = useState<IGetCards[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [savedCards, setSavedCards] = useState<IGetCards[]>([]);
@@ -127,6 +131,18 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
     setPageSavedCards(nextPage);
   };
 
+  const onFollow = () => {
+    if (!id) return;
+
+    follow({ user_id: id });
+  };
+
+  const onUnfollow = () => {
+    if (!id) return;
+
+    unfollow({ user_id: id });
+  };
+
   const tabsContent = {
     [ProfileTabNames.MY_TABS]: (
       <div>
@@ -193,10 +209,10 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
         )}
       >
         <div className={cx("info-description__subscribers")}>
-          {subscribers} подписчиков
+          {followers_count} подписчиков
         </div>
         <div className={cx("info-description__subscription")}>
-          {subscription} подписок
+          {following_count} подписок
         </div>
       </div>
       <div className={cx("profile-info__buttons")}>
@@ -207,6 +223,15 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
             theme={theme}
             size={width < 992 ? "small" : "medium"}
             onClick={navigateToProfileEdit}
+          />
+        )}
+        {!!id && (
+          <Button
+            text={is_following ? "Отписаться" : "Подписаться"}
+            color="white"
+            theme={theme}
+            size={width < 992 ? "small" : "medium"}
+            onClick={is_following ? onUnfollow : onFollow}
           />
         )}
         <Button

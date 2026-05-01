@@ -4,7 +4,7 @@ import { baseQueryWithReauth } from "@/store/baseQueryWithReauth";
 export const usersApi = createApi({
   reducerPath: "usersApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["User"],
+  tagTypes: ["User", "Subscriptions"],
   endpoints: (builder) => ({
     getUserMe: builder.query<any, {}>({
       query: () => ({
@@ -18,6 +18,7 @@ export const usersApi = createApi({
         url: `users/${credentials.id}/`,
         method: "GET",
       }),
+      providesTags: ["User"],
     }),
     updateUser: builder.mutation<any, { data: FormData }>({
       query: (credentials) => ({
@@ -27,8 +28,29 @@ export const usersApi = createApi({
       }),
       invalidatesTags: ["User"],
     }),
+    follow: builder.mutation<any, { user_id: string }>({
+      query: (credentials) => ({
+        url: "subscriptions/follow/",
+        method: "POST",
+        body: credentials,
+      }),
+      invalidatesTags: ["Subscriptions", "User"],
+    }),
+    unfollow: builder.mutation<any, { user_id: string }>({
+      query: (credentials) => ({
+        url: "subscriptions/unfollow/",
+        method: "POST",
+        body: credentials,
+      }),
+      invalidatesTags: ["Subscriptions", "User"],
+    }),
   }),
 });
 
-export const { useGetUserMeQuery, useGetUserQuery, useUpdateUserMutation } =
-  usersApi;
+export const {
+  useGetUserMeQuery,
+  useGetUserQuery,
+  useUpdateUserMutation,
+  useFollowMutation,
+  useUnfollowMutation,
+} = usersApi;

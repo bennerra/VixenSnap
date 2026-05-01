@@ -5,4 +5,7 @@ export interface IUser {
   name: string;
   registration_date: string;
   username: string;
+  is_following: boolean;
+  followers_count: number;
+  following_count: number;
 }

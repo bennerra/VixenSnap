@@ -8,6 +8,8 @@ import { ReactComponent as Like } from "@/assets/likes-filled.svg";
 import { ReactComponent as EmptyLike } from "@/assets/empty-like.svg";
 import { useGetUserQuery } from "@/store/api/UsersApi";
 import {
+  useAddCommentMutation,
+  useGetCommentsQuery,
   useSaveCardMutation,
   useSetLikeToCardMutation,
 } from "@/store/api/CardsApi";
@@ -42,10 +44,13 @@ const CardInfo: FC<CardInfoProps> = ({
   const { theme } = useContext(ThemeContext);
   const { data: user } = useGetUserQuery({ id: author_id });
   const [setLike] = useSetLikeToCardMutation();
+  const [addComment] = useAddCommentMutation();
   const [saveCard] = useSaveCardMutation();
   const [hasSave, setHasSave] = useState<boolean>(isSave);
   const [hasLike, setHasLike] = useState<boolean>(is_liked);
   const [quantityLikes, setQuantityLikes] = useState<number>(likes);
+  const [commentText, setCommentText] = useState<string>("");
+  const { data } = useGetCommentsQuery({ id });
 
   const linkToUserPage = useMemo(() => {
     const isUsersCard = user?.userMeInfo?.id === author_id;
@@ -69,6 +74,39 @@ const CardInfo: FC<CardInfoProps> = ({
     } catch (e) {
       console.log(e);
     }
+  };
+
+  const handleAddComment = async () => {
+    if (!commentText.trim()) return;
+
+    try {
+      await addComment({
+        post: id,
+        text: commentText,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const commentDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+
+    const diffTime = today.getTime() - commentDate.getTime();
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+    if (diffDays === 0) return "сегодня";
+    if (diffDays === 1) return "вчера";
+    if (diffDays < 7) return `${diffDays} дня(ей) назад`;
+    return date.toLocaleDateString("ru-RU");
   };
 
   return (
@@ -114,6 +152,79 @@ const CardInfo: FC<CardInfoProps> = ({
                 {hasLike ? <Like /> : <EmptyLike />}
               </div>
               {quantityLikes}
+            </div>
+          </div>
+          <div className={cx("comments-section", `comments-section-${theme}`)}>
+            <h3 className={cx("comments-section__title")}>
+              Комментарии ({data?.count || 0})
+            </h3>
+            <div className={cx("comment-form", `comment-form-${theme}`)}>
+              <textarea
+                className={cx(
+                  "comment-form__input",
+                  `comment-form__input-${theme}`
+                )}
+                placeholder="Напишите комментарий..."
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                rows={3}
+              />
+              <Button
+                theme={theme}
+                text="Отправить"
+                color="orange"
+                size="medium"
+                onClick={handleAddComment}
+                disabled={!commentText.trim()}
+              />
+            </div>
+            <div className={cx("comments-list", `comments-list-${theme}`)}>
+              {!data?.count ? (
+                <div
+                  className={cx(
+                    "comments-list__empty",
+                    `comments-list__empty-${theme}`
+                  )}
+                >
+                  Пока нет комментариев. Будьте первым!
+                </div>
+              ) : (
+                data.results.map((comment) => (
+                  <div
+                    key={comment.id}
+                    className={cx("comment-item", `comment-item-${theme}`)}
+                  >
+                    <div className={cx("comment-item__header")}>
+                      <Link to={`/profile/${comment.author_id}`}>
+                        <span
+                          className={cx(
+                            "comment-item__author",
+                            `comment-item__author-${theme}`
+                          )}
+                        >
+                          {comment.author_name}
+                        </span>
+                      </Link>
+                      <span
+                        className={cx(
+                          "comment-item__date",
+                          `comment-item__date-${theme}`
+                        )}
+                      >
+                        {formatDate(comment.created_at)}
+                      </span>
+                    </div>
+                    <p
+                      className={cx(
+                        "comment-item__text",
+                        `comment-item__text-${theme}`
+                      )}
+                    >
+                      {comment.text}
+                    </p>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
