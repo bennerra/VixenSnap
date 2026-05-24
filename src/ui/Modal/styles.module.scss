@@ -1,0 +1,192 @@
+@import "../../_variables";
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+
+  &--light {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  &--dark {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+}
+
+.modal-content {
+  position: relative;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  border-radius: 12px;
+  overflow: hidden; // ← УДАЛИТЬ ЭТУ СТРОКУ или перенести внутрь
+  animation: slideUp 0.3s ease-in-out;
+  display: flex; // ← ДОБАВИТЬ для правильного flex-поведения
+  flex-direction: column; // ← ДОБАВИТЬ
+
+  &--light {
+    background-color: $color-white;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  &--dark {
+    background-color: $wet-asphalt;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.modal-header {
+  flex-shrink: 0; // ← ДОБАВИТЬ чтобы header не сжимался
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid;
+
+  &--light {
+    border-bottom-color: $light-gray;
+  }
+
+  &--dark {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+
+  &--light {
+    color: $grey-umber;
+  }
+
+  &--dark {
+    color: $color-white;
+  }
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.3s ease-in-out;
+  font-weight: 400;
+  flex-shrink: 0;
+
+  &--light {
+    color: $grey-umber;
+
+    &:hover {
+      background-color: $light-gray;
+    }
+  }
+
+  &--dark {
+    color: $color-white;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+
+.modal-body {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+
+  &--light {
+    color: $grey-umber;
+  }
+
+  &--dark {
+    color: $color-white;
+  }
+}
+
+.modal-footer {
+  flex-shrink: 0;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 20px 24px;
+  border-top: 1px solid;
+
+  &--light {
+    border-top-color: $light-gray;
+  }
+
+  &--dark {
+    border-top-color: rgba(255, 255, 255, 0.1);
+  }
+
+  button {
+    width: auto;
+    min-width: 100px;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .modal-content {
+    width: 95%;
+    margin: 16px;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .modal-header {
+    padding: 16px 20px;
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .modal-footer {
+    padding: 16px 20px;
+  }
+}

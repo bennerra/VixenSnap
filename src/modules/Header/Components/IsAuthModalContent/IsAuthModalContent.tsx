@@ -22,9 +22,6 @@ const IsAuthModalContent: FC<IsAuthModalProps> = ({ setIsOpenMenu }) => {
 
   return (
     <ul className={cx("menu-list", `menu-list-${theme}`)}>
-      <li onClick={handleCloseMenu} className={cx("menu-list__item")}>
-        Уведомления
-      </li>
       <div onClick={() => navigate(0)}>
         <Link to="/">
           <li onClick={handleCloseMenu} className={cx("menu-list__item")}>

@@ -1,5 +1,5 @@
 import { LocalStorageNames } from "@/constants/localeStorage";
-import { AppRoutes, NotAuthPaths } from "@/constants/paths";
+import { AppRoutes, AuthRoutes } from "@/constants/paths";
 import { cookies, CookiesNames } from "@/constants/cookies";
 import { Mutex } from "async-mutex";
 import { fetchBaseQuery } from "@reduxjs/toolkit/query";
@@ -28,7 +28,7 @@ export const baseQueryWithReauth = async (
 
   if (result.error && result.error.status === 401) {
     const currentPage = window.location.pathname;
-    const isPublicPath = NotAuthPaths.includes(currentPage as AppRoutes);
+    const isPublicPath = !AuthRoutes.includes(currentPage as AppRoutes);
 
     if (isPublicPath) {
       return result;

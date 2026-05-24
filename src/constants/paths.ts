@@ -18,8 +18,7 @@ export const NotAuthPaths: AppRoutes[] = [
 ];
 
 export const AuthRoutes: AppRoutes[] = [
-  AppRoutes.PROFILE,
-  AppRoutes.CARD_DETAIL,
+  AppRoutes.PROFILE_ME,
   AppRoutes.CREATION,
   AppRoutes.PROFILE_EDIT,
 ];

@@ -12,6 +12,7 @@ import { Button } from "@/ui/Button";
 import { useCreationCardMutation } from "@/store/api/CardsApi";
 import { FileInput } from "@/ui/FileInput/FileInput";
 
+import { NotificationContext } from "@/context/NotificationContext";
 import styles from "./styles.module.scss";
 
 const cx = classNames.bind(styles);
@@ -32,16 +33,22 @@ const CreationCardForm: FC = () => {
   const [files, setFiles] = useState<File[]>([]);
   const navigate = useNavigate();
   const [createCard] = useCreationCardMutation();
+  const { showNotification } = useContext(NotificationContext);
 
   const onSubmit: SubmitHandler<ICreationCard> = async (data) => {
-    const sendData = new FormData();
-    sendData.append("name", data.name);
-    sendData.append("description", data.description);
-    files.forEach((el: File) => {
-      sendData.append("image", el);
-    });
-    await createCard(sendData).unwrap();
-    navigate("/");
+    try {
+      const sendData = new FormData();
+      sendData.append("name", data.name);
+      sendData.append("description", data.description);
+      files.forEach((el: File) => {
+        sendData.append("image", el);
+      });
+      await createCard(sendData).unwrap();
+      showNotification("Пост успешно создан", "success");
+      navigate("/");
+    } catch (e) {
+      showNotification("Не удалось создать пост", "error");
+    }
   };
 
   const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {

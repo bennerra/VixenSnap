@@ -1,6 +1,7 @@
 @import "../../_variables";
 
 .profile-info {
+  position: relative;
   color: $grey-umber;
   width: 100%;
   padding: 30px 0;
@@ -24,10 +25,14 @@
     font-weight: 600;
     margin-bottom: 10px;
     overflow: hidden;
-    & > * {
+    & > img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+    }
+
+    &.premium {
+      border: 3px solid $color-orange;
     }
   }
   &__name {
@@ -132,4 +137,10 @@
   margin-top: 80px;
   text-align: center;
   font-size: 24px;
+}
+
+.premiumButton {
+  position: absolute;
+  top: 30px;
+  right: 0;
 }

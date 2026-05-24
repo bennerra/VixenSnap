@@ -6,7 +6,6 @@ import { ThemeContext } from "@/context";
 import { Button } from "@/ui/Button";
 import { ReactComponent as Like } from "@/assets/likes-filled.svg";
 import { ReactComponent as EmptyLike } from "@/assets/empty-like.svg";
-import { useGetUserQuery } from "@/store/api/UsersApi";
 import {
   useAddCommentMutation,
   useGetCommentsQuery,
@@ -25,7 +24,6 @@ interface CardInfoProps {
   likes: number;
   is_liked: boolean;
   id: string;
-  author_id: string;
   author_name: string;
   isSave: boolean;
 }
@@ -38,11 +36,9 @@ const CardInfo: FC<CardInfoProps> = ({
   is_liked,
   id,
   author_name,
-  author_id,
   isSave,
 }) => {
   const { theme } = useContext(ThemeContext);
-  const { data: user } = useGetUserQuery({ id: author_id });
   const [setLike] = useSetLikeToCardMutation();
   const [addComment] = useAddCommentMutation();
   const [saveCard] = useSaveCardMutation();
@@ -53,9 +49,8 @@ const CardInfo: FC<CardInfoProps> = ({
   const { data } = useGetCommentsQuery({ id });
 
   const linkToUserPage = useMemo(() => {
-    const isUsersCard = user?.userMeInfo?.id === author_id;
-    return isUsersCard ? "/profile/me" : `/profile/${author_id}`;
-  }, [author_id, user]);
+    return `/profile/${author_name}`;
+  }, [author_name]);
 
   const handleIsLiked = async () => {
     try {
@@ -84,6 +79,7 @@ const CardInfo: FC<CardInfoProps> = ({
         post: id,
         text: commentText,
       });
+      setCommentText("");
     } catch (e) {
       console.log(e);
     }

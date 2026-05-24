@@ -8,4 +8,5 @@ export interface IUser {
   is_following: boolean;
   followers_count: number;
   following_count: number;
+  is_premium: boolean;
 }

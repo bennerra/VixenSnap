@@ -11,14 +11,18 @@ import { NotificationContext } from "@/context/NotificationContext";
 import { ProfileTabNames, profileTabs } from "@/modules/ProfileInfo/constants";
 import { CardsInfiniteScroll } from "@/modules/CardsInfiniteScroll";
 import {
-  useLazyGetMyCardsQuery,
-  useLazyGetMySavedCardsQuery,
   useLazyGetUserCardsQuery,
   useLazyGetUserSavedCardsQuery,
 } from "@/store/api/CardsApi";
 import { IGetCards } from "@/models/IGetCards";
 import { AppRoutes } from "@/constants/paths";
-import { useFollowMutation, useUnfollowMutation } from "@/store/api/UsersApi";
+import {
+  useFollowMutation,
+  useGetUserMeQuery,
+  useUnfollowMutation,
+} from "@/store/api/UsersApi";
+import { PremiumButton } from "@/ui/PremiumButton/PremiumButton";
+import { GetPremiumModal } from "@/modules/GetPremiumModal/GetPremiumModal";
 import Loader from "../../ui/Loader/Loader";
 
 import styles from "./styles.module.scss";
@@ -39,33 +43,32 @@ const ProfileInfo: FC<ProfileInfoProps> = ({ user }) => {
     followers_count,
     following_count,
     is_following,
+    is_premium,
   } = user;
   const { width } = useResize();
   const { id } = useParams();
   const [tab, setTab] = useState(ProfileTabNames.MY_TABS);
   const [page, setPage] = useState<number>(1);
   const [pageSavedCards, setPageSavedCards] = useState<number>(1);
-  const [getMyCards, { isLoading: isLoadingMyCards }] = useLazyGetMyCardsQuery(
-    {}
-  );
   const [getCards, { isLoading: isLoadingCards }] = useLazyGetUserCardsQuery(
     {}
   );
-  const [getMySavedCards, { isLoading: isLoadingMySavedCards }] =
-    useLazyGetMySavedCardsQuery({});
   const [getSavedCards, { isLoading: isLoadingSavedCards }] =
     useLazyGetUserSavedCardsQuery({});
   const [follow] = useFollowMutation();
   const [unfollow] = useUnfollowMutation();
+  const { data } = useGetUserMeQuery({});
   const [cards, setCards] = useState<IGetCards[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [savedCards, setSavedCards] = useState<IGetCards[]>([]);
   const [savedTotalCount, setSavedTotalCount] = useState<number>(0);
-  const methodGetCards = id ? getCards : getMyCards;
-  const methodGetSavedCards = id ? getSavedCards : getMySavedCards;
-  const isLoading = id ? isLoadingCards : isLoadingMyCards;
-  const isLoadingSaved = id ? isLoadingSavedCards : isLoadingMySavedCards;
+  const [isOpenPremiumModal, setIsOpenPremiumModal] = useState(false);
   const navigate = useNavigate();
+  const isCurrentUser = id === data?.username;
+
+  const handleOpenPremiumModal = () => {
+    setIsOpenPremiumModal((prev) => !prev);
+  };
 
   const navigateToProfileEdit = () => {
     navigate(AppRoutes.PROFILE_EDIT);
@@ -76,9 +79,9 @@ const ProfileInfo: FC<ProfileInfoProps> = ({ user }) => {
       try {
         const payload = {
           page,
-          id: id || "",
+          id: username,
         };
-        const response = await methodGetCards(payload).unwrap();
+        const response = await getCards(payload).unwrap();
         setCards([...response.results]);
         setTotalCount(response.count);
       } catch (e) {
@@ -90,9 +93,9 @@ const ProfileInfo: FC<ProfileInfoProps> = ({ user }) => {
       try {
         const payload = {
           page: pageSavedCards,
-          id: id || "",
+          id: username,
         };
-        const response = await methodGetSavedCards(payload).unwrap();
+        const response = await getSavedCards(payload).unwrap();
         setSavedCards([...response.results]);
         setSavedTotalCount(response.count);
       } catch (e) {
@@ -103,17 +106,17 @@ const ProfileInfo: FC<ProfileInfoProps> = ({ user }) => {
     fetchCards();
     fetchSavedCards();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [username]);
 
   const onFetchMore = async () => {
     if (cards.length === totalCount) return;
 
     const payload = {
       page,
-      id: id || "",
+      id: username,
     };
     const nextPage = page + 1;
-    const response = await methodGetCards(payload).unwrap();
+    const response = await getSavedCards(payload).unwrap();
     setCards((prev) => [...prev, ...response.results]);
     setPage(nextPage);
   };
@@ -123,30 +126,30 @@ const ProfileInfo: FC<ProfileInfoProps> = ({ user }) => {
 
     const payload = {
       page: pageSavedCards,
-      id: id || "",
+      id: username,
     };
     const nextPage = pageSavedCards + 1;
-    const response = await methodGetSavedCards(payload).unwrap();
+    const response = await getSavedCards(payload).unwrap();
     setSavedCards((prev) => [...prev, ...response.results]);
     setPageSavedCards(nextPage);
   };
 
   const onFollow = () => {
-    if (!id) return;
+    if (isCurrentUser) return;
 
-    follow({ user_id: id });
+    follow({ user_identifier: id || "" });
   };
 
   const onUnfollow = () => {
-    if (!id) return;
+    if (isCurrentUser) return;
 
-    unfollow({ user_id: id });
+    unfollow({ user_identifier: id || "" });
   };
 
   const tabsContent = {
     [ProfileTabNames.MY_TABS]: (
       <div>
-        {isLoading ? (
+        {isLoadingCards ? (
           <div className={styles.loaderContainer}>
             <Loader />
           </div>
@@ -167,7 +170,7 @@ const ProfileInfo: FC<ProfileInfoProps> = ({ user }) => {
     ),
     [ProfileTabNames.SAVED]: (
       <div>
-        {isLoadingSaved ? (
+        {isLoadingSavedCards ? (
           <div className={styles.loaderContainer}>
             <Loader />
           </div>
@@ -191,12 +194,12 @@ const ProfileInfo: FC<ProfileInfoProps> = ({ user }) => {
   const onShareLink = () => {
     const link = window.location.href;
     navigator.clipboard.writeText(link);
-    showNotification("Профиль скопирован в буфер обмена");
+    showNotification("Профиль скопирован в буфер обмена", "info");
   };
 
   return (
     <div className={cx("profile-info", `profile-info-${theme}`)}>
-      <div className={cx("profile-info__img")}>
+      <div className={cx("profile-info__img", { premium: is_premium })}>
         {avatar ? <img src={avatar} alt="" /> : Array.from(name)[0]}
       </div>
       <div className={cx("profile-info__name")}>{name}</div>
@@ -216,7 +219,7 @@ const ProfileInfo: FC<ProfileInfoProps> = ({ user }) => {
         </div>
       </div>
       <div className={cx("profile-info__buttons")}>
-        {!id && (
+        {isCurrentUser && (
           <Button
             text="Изменить профиль"
             color="white"
@@ -225,7 +228,7 @@ const ProfileInfo: FC<ProfileInfoProps> = ({ user }) => {
             onClick={navigateToProfileEdit}
           />
         )}
-        {!!id && (
+        {!isCurrentUser && (
           <Button
             text={is_following ? "Отписаться" : "Подписаться"}
             color="white"
@@ -256,6 +259,23 @@ const ProfileInfo: FC<ProfileInfoProps> = ({ user }) => {
         </div>
         <div className={styles.tabsContent}>{tabsContent[tab]}</div>
       </div>
+      {!is_premium && isCurrentUser && (
+        <>
+          <div className={styles.premiumButton}>
+            <PremiumButton
+              onClick={handleOpenPremiumModal}
+              size={width < 992 ? "small" : "medium"}
+            >
+              Премиум подписка
+            </PremiumButton>
+          </div>
+          <GetPremiumModal
+            isOpen={isOpenPremiumModal}
+            onClose={handleOpenPremiumModal}
+            theme={theme}
+          />
+        </>
+      )}
     </div>
   );
 };

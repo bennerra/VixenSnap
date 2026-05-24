@@ -14,6 +14,7 @@ import { LocalStorageNames } from "@/constants/localeStorage";
 import { cookies, CookiesNames } from "@/constants/cookies";
 import { AppRoutes } from "@/constants/paths";
 
+import { NotificationContext } from "@/context/NotificationContext";
 import styles from "./styles.module.scss";
 
 const cx = classNames.bind(styles);
@@ -36,14 +37,20 @@ const LoginForm: FC = () => {
     resolver: yupResolver(schema) as any,
   });
   const [trigger, { isError }] = useLoginMutation();
+  const { showNotification } = useContext(NotificationContext);
 
   const onSubmit: SubmitHandler<ILoginForm> = async (data) => {
-    const response = await trigger(data).unwrap();
-    localStorage.setItem(LocalStorageNames.AUTH, response.access);
-    cookies.set(CookiesNames.AUTH, response.refresh, {
-      expires: new Date(Date.now() + 86400000),
-    });
-    window.location.href = AppRoutes.MAIN;
+    try {
+      const response = await trigger(data).unwrap();
+      localStorage.setItem(LocalStorageNames.AUTH, response.access);
+      cookies.set(CookiesNames.AUTH, response.refresh, {
+        expires: new Date(Date.now() + 86400000),
+      });
+      window.location.href = AppRoutes.MAIN;
+      showNotification("Вы успешно вошли в аккаунт", "success");
+    } catch (e) {
+      showNotification("Не удалось войти в аккаунт", "error");
+    }
   };
 
   return (

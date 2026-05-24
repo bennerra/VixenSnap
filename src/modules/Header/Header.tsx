@@ -12,11 +12,10 @@ import { ThemeContext } from "@/context";
 import { ReactComponent as Burger } from "@/assets/burger.svg";
 import { ModalMenuLayout } from "@/layouts/ModalMenuLayout";
 import { ModalContent } from "@/modules/Header/Components/ModalContent";
-import { LocalStorageNames } from "@/constants/localeStorage";
 import { HeaderProfilePreview } from "@/modules/Header/Components/HeaderProfilePreview/HeaderProfilePreview";
 import { IsAuthModalContent } from "@/modules/Header/Components/IsAuthModalContent";
-import { ReactComponent as Notifications } from "@/assets/notifications.svg";
 import { ReactComponent as SearchButton } from "@/assets/search-button.svg";
+import { cookies, CookiesNames } from "@/constants/cookies";
 import { HeaderButtonsList } from "./Components/HeaderButtonsList";
 import { HeaderLogo } from "./Components/HeaderLogo";
 
@@ -33,7 +32,7 @@ type Props = {
 const Header: FC<Props> = (props) => {
   const { searchValue, setSearchValue, isSearch } = props;
   const [isOpenMenu, setIsOpenMenu] = useState(false);
-  const isAuth = !!localStorage.getItem(LocalStorageNames.AUTH);
+  const isAuth = !!cookies.get(CookiesNames.AUTH);
   const { theme } = useContext(ThemeContext);
   const navigate = useNavigate();
 
@@ -79,9 +78,6 @@ const Header: FC<Props> = (props) => {
           </div>
           {isAuth ? (
             <div className={cx("header__information", "header-information")}>
-              <div className={cx("header-information__notifications")}>
-                <Notifications />
-              </div>
               <div
                 className={cx("header-information__burger", "header-burger")}
               >

@@ -4,28 +4,103 @@
   position: fixed;
   top: 40px;
   right: 20px;
-  background-color: $color-white;
+  max-width: 400px;
+  width: calc(100vw - 40px);
+  background: $color-white;
   color: $wet-asphalt;
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(44, 44, 44, 0.1),
-  0 0 40px rgba(44, 44, 44, 0.05);
+  border-radius: 12px;
+  box-shadow:
+          0 4px 16px rgba(0, 0, 0, 0.1),
+          0 1px 3px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid transparent;
+  animation: slideIn 0.3s ease-out;
+  z-index: 10000;
 
   &.dark {
-    background-color: $wet-asphalt;
+    background: $wet-asphalt;
     color: $color-white;
-    box-shadow: 0 0 25px rgba(255, 255, 255, 0.08),
-    0 0 40px rgba(208, 208, 208, 0.04);
+    box-shadow:
+            0 4px 16px rgba(255, 255, 255, 0.1),
+            0 1px 3px rgba(255, 255, 255, 0.08);
+  }
+
+  &.success {
+    border-left-color: $color-green;
+
+    &.dark {
+      border-left-color: lighten($color-green, 20%);
+    }
+  }
+
+  &.info {
+    border-left-color: $color-blue;
+
+    &.dark {
+      border-left-color: lighten($color-blue, 20%);
+    }
+  }
+
+  &.error {
+    border-left-color: $color-red;
+
+    &.dark {
+      border-left-color: lighten($color-red, 20%);
+    }
   }
 }
 
 .notification_container {
   position: relative;
-  padding: 20px;
+  padding: 16px 20px 16px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .close {
   position: absolute;
-  top: 7px;
-  right: 10px;
+  top: 12px;
+  right: 12px;
   cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.notification__icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+
+  &.success {
+    color: $color-green;
+  }
+
+  &.info {
+    color: $color-blue;
+  }
+
+  &.error {
+    color: $color-red;
+  }
+}
+
+.notification__text {
+  font-size: 14px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }

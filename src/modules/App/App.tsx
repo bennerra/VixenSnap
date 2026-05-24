@@ -14,6 +14,7 @@ import { OAuth } from "@/modules/OAuth";
 import { AppRoutes } from "@/constants/paths";
 import { NavigateRouter } from "@/layouts/NavigateRouter/NavigateRouter";
 import { ProfileEdit } from "@/pages/ProfileEdit/ProfileEdit";
+import { CookieBanner } from "@/modules/CookieBanner/CookieBanner";
 
 import styles from "./styles.module.scss";
 
@@ -25,6 +26,7 @@ const App: FC = () => {
 
   return (
     <NavigateRouter currentPage={pathname as AppRoutes}>
+      <CookieBanner />
       <div className={cx("App", `App-${theme}`)}>
         <Routes>
           <Route path={AppRoutes.MAIN} element={<Home />} />

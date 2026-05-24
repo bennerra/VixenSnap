@@ -23,7 +23,7 @@ export const cardsApi = createApi({
     }),
     getUserCards: builder.query<any, { page: number; id: string }>({
       query: ({ page, id }) => ({
-        url: `user_posts/${id}?page=${page}`,
+        url: `user_posts/?page=${page}&username=${id}`,
         method: "GET",
       }),
       providesTags: ["Cards"],
@@ -55,16 +55,9 @@ export const cardsApi = createApi({
       }),
       invalidatesTags: ["SavedCards"],
     }),
-    getMySavedCards: builder.query<any, { page: number }>({
-      query: ({ page }) => ({
-        url: `saved_posts?page=${page}`,
-        method: "GET",
-      }),
-      providesTags: ["SavedCards"],
-    }),
     getUserSavedCards: builder.query<any, { page: number; id: string }>({
       query: ({ page, id }) => ({
-        url: `saved_posts/${id}?page=${page}`,
+        url: `saved_posts/?page=${page}&username=${id}`,
         method: "GET",
       }),
       providesTags: ["SavedCards"],
@@ -89,13 +82,11 @@ export const cardsApi = createApi({
 
 export const {
   useLazyGetCardsQuery,
-  useLazyGetMyCardsQuery,
   useLazyGetUserCardsQuery,
   useSetLikeToCardMutation,
   useGetCardQuery,
   useCreationCardMutation,
   useSaveCardMutation,
-  useLazyGetMySavedCardsQuery,
   useLazyGetUserSavedCardsQuery,
   useAddCommentMutation,
   useGetCommentsQuery,

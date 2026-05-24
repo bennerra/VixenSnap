@@ -28,7 +28,7 @@ export const usersApi = createApi({
       }),
       invalidatesTags: ["User"],
     }),
-    follow: builder.mutation<any, { user_id: string }>({
+    follow: builder.mutation<any, { user_identifier: string }>({
       query: (credentials) => ({
         url: "subscriptions/follow/",
         method: "POST",
@@ -36,13 +36,21 @@ export const usersApi = createApi({
       }),
       invalidatesTags: ["Subscriptions", "User"],
     }),
-    unfollow: builder.mutation<any, { user_id: string }>({
+    unfollow: builder.mutation<any, { user_identifier: string }>({
       query: (credentials) => ({
         url: "subscriptions/unfollow/",
         method: "POST",
         body: credentials,
       }),
       invalidatesTags: ["Subscriptions", "User"],
+    }),
+    getPremium: builder.mutation<any, { duration_months: number }>({
+      query: (credentials) => ({
+        url: "premium/purchase/",
+        method: "POST",
+        body: credentials,
+      }),
+      invalidatesTags: ["User"],
     }),
   }),
 });
@@ -53,4 +61,5 @@ export const {
   useUpdateUserMutation,
   useFollowMutation,
   useUnfollowMutation,
+  useGetPremiumMutation,
 } = usersApi;

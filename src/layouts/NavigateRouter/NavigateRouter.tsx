@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { type FC, type ReactNode, useEffect } from "react";
 
 import { cookies, CookiesNames } from "@/constants/cookies";
-import { AppRoutes, NotAuthPaths } from "@/constants/paths";
+import { AppRoutes, AuthRoutes, NotAuthPaths } from "@/constants/paths";
 
 interface Props {
   currentPage: AppRoutes;
@@ -19,7 +19,7 @@ export const NavigateRouter: FC<Props> = ({ currentPage, children }) => {
     route = AppRoutes.MAIN;
   }
 
-  if (!refreshToken && !NotAuthPaths.includes(currentPage)) {
+  if (!refreshToken && AuthRoutes.includes(currentPage)) {
     route = AppRoutes.AUTH;
   }
 

@@ -19,7 +19,7 @@ const Card: FC = () => {
   return (
     <div className={cx("card")}>
       <Header />
-      <div className={cx("container")}>
+      <div className={cx("container", "card-container")}>
         <div className={cx("card__content")}>
           {isLoading || !card?.id ? (
             <CardSkeleton />
@@ -32,7 +32,6 @@ const Card: FC = () => {
               is_liked={card.is_liked}
               id={card.id}
               author_name={card.author_name}
-              author_id={card.author_id}
               isSave={card.is_save}
             />
           )}

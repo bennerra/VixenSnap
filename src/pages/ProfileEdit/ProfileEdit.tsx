@@ -287,7 +287,6 @@ export const ProfileEdit: FC = () => {
           Редактирование профиля
         </h2>
         <div className={styles["form-edit__content"]}>
-          {/* Аватар */}
           <div className={cx("form-edit__group", `form-edit__group-${theme}`)}>
             <div
               className={cx(
@@ -369,7 +368,6 @@ export const ProfileEdit: FC = () => {
                 </div>
               )}
             </div>
-
             <div className={styles["form-edit__field"]}>
               <div
                 className={cx("form-edit__label", `form-edit__label-${theme}`)}
@@ -397,8 +395,6 @@ export const ProfileEdit: FC = () => {
               )}
             </div>
           </div>
-
-          {/* Изменение пароля */}
           <div className={cx("form-edit__group", `form-edit__group-${theme}`)}>
             <div
               className={cx(
@@ -408,7 +404,6 @@ export const ProfileEdit: FC = () => {
             >
               Изменение пароля
             </div>
-
             <label
               htmlFor="isEditPassword"
               className={cx("checkbox", `checkbox-${theme}`)}
@@ -425,7 +420,6 @@ export const ProfileEdit: FC = () => {
                 Изменить пароль
               </span>
             </label>
-
             {isEditPassword && (
               <>
                 <div className={styles["form-edit__field"]}>
@@ -455,7 +449,6 @@ export const ProfileEdit: FC = () => {
                     </div>
                   )}
                 </div>
-
                 <div className={styles["form-edit__field"]}>
                   <div
                     className={cx(
@@ -483,7 +476,6 @@ export const ProfileEdit: FC = () => {
                     </div>
                   )}
                 </div>
-
                 <div className={styles["form-edit__field"]}>
                   <div
                     className={cx(

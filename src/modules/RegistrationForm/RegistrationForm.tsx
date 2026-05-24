@@ -1,4 +1,4 @@
-import React, { FC, useContext } from "react";
+import React, { FC, useContext, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import classNames from "classnames/bind";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -13,6 +13,9 @@ import { LocalStorageNames } from "@/constants/localeStorage";
 import { cookies, CookiesNames } from "@/constants/cookies";
 import { AppRoutes } from "@/constants/paths";
 
+import { TermsOfServiceModal } from "@/modules/RegistrationForm/TermsOfServiceModal";
+import { PrivacyPolicyModal } from "@/modules/RegistrationForm/PrivacyPolicyModal";
+import { NotificationContext } from "@/context/NotificationContext";
 import styles from "./styles.module.scss";
 
 const cx = classNames.bind(styles);
@@ -24,7 +27,10 @@ const schema = yup
       .string()
       .required("Это обязательное поле!")
       .min(8, "Поле должно быть не меньше 8 символов"),
-    password: yup.string().required("Это обязательное поле!").min(8),
+    password: yup
+      .string()
+      .required("Это обязательное поле!")
+      .min(8, "Поле должно быть не меньше 8 символов"),
     email: yup
       .string()
       .required("Это обязательное поле!")
@@ -46,6 +52,17 @@ const RegistrationForm: FC = () => {
     useRegistrationMutation();
   const [loginUser] = useLoginMutation();
   const error = registrationErrors as any;
+  const [conditionsModalVisible, setConditionsModalVisible] = useState(false);
+  const [policyModalVisible, setPolicyModalVisible] = useState(false);
+  const { showNotification } = useContext(NotificationContext);
+
+  const handleOpenConditionsModal = () => {
+    setConditionsModalVisible((prev) => !prev);
+  };
+
+  const handleOpenPolicyModal = () => {
+    setPolicyModalVisible((prev) => !prev);
+  };
 
   const onSubmit: SubmitHandler<IRegistrationForm> = async (data) => {
     try {
@@ -60,8 +77,9 @@ const RegistrationForm: FC = () => {
         expires: new Date(Date.now() + 86400000),
       });
       window.location.href = AppRoutes.MAIN;
+      showNotification("Профиль успешно создан", "success");
     } catch (e) {
-      console.error(e);
+      showNotification("Не удалось создать профиль", "error");
     }
   };
 
@@ -75,6 +93,11 @@ const RegistrationForm: FC = () => {
           placeholder="Имя пользователя *"
           error={errors?.username?.message}
         />
+        {!!errors?.username && (
+          <div className={cx("registration-form__error")}>
+            {errors?.username?.message}
+          </div>
+        )}
         {!!error?.data?.username?.length && (
           <div className={cx("registration-form__error")}>
             {error?.data?.username[0]}
@@ -90,6 +113,11 @@ const RegistrationForm: FC = () => {
           type="password"
           error={errors?.password?.message}
         />
+        {!!errors?.password && (
+          <div className={cx("registration-form__error")}>
+            {errors?.password?.message}
+          </div>
+        )}
         {!!error?.data?.password?.length && (
           <div className={cx("registration-form__error")}>
             {error?.data?.password[0]}
@@ -105,6 +133,11 @@ const RegistrationForm: FC = () => {
           type="email"
           error={errors?.email?.message}
         />
+        {!!errors?.email && (
+          <div className={cx("registration-form__error")}>
+            {errors?.email?.message}
+          </div>
+        )}
         {!!error?.data?.email?.length && (
           <div className={cx("registration-form__error")}>
             {error?.data?.email[0]}
@@ -119,6 +152,11 @@ const RegistrationForm: FC = () => {
           placeholder="Имя *"
           error={errors?.name?.message}
         />
+        {!!errors?.name && (
+          <div className={cx("registration-form__error")}>
+            {errors?.name?.message}
+          </div>
+        )}
         {!!error?.data?.name?.length && (
           <div className={cx("registration-form__error")}>
             {error?.data?.name[0]}
@@ -131,7 +169,39 @@ const RegistrationForm: FC = () => {
             {item}
           </div>
         ))}
+      <p
+        className={cx(
+          "registration-form__confirm",
+          `registration-form__confirm-${theme}`
+        )}
+      >
+        Продолжая, вы принимаете{" "}
+        <span
+          className={cx("registration-form__confirm-link")}
+          onClick={handleOpenConditionsModal}
+        >
+          Условия предоставления услуг PixFlow
+        </span>{" "}
+        и подтверждаете, что ознакомились с нашей{" "}
+        <span
+          className={cx("registration-form__confirm-link")}
+          onClick={handleOpenPolicyModal}
+        >
+          Политикой конфиденциальности
+        </span>
+        .
+      </p>
       <AuthButtonsList text="Зарегистрироваться" />
+      <TermsOfServiceModal
+        theme={theme}
+        isOpen={conditionsModalVisible}
+        onClose={handleOpenConditionsModal}
+      />
+      <PrivacyPolicyModal
+        onClose={handleOpenPolicyModal}
+        isOpen={policyModalVisible}
+        theme={theme}
+      />
     </form>
   );
 };

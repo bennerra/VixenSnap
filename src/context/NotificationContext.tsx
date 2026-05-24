@@ -8,10 +8,10 @@ import {
   useRef,
   useState,
 } from "react";
-import { Notification } from "@/ui/Notification/Notification";
+import { Notification, NotificationType } from "@/ui/Notification/Notification";
 
 type NotificationContextState = {
-  showNotification: (message: string) => void;
+  showNotification: (message: string, type: NotificationType) => void;
 };
 
 export const NotificationContext = createContext<NotificationContextState>({
@@ -21,6 +21,7 @@ export const NotificationContext = createContext<NotificationContextState>({
 export const NotificationLayout: FC<PropsWithChildren> = ({ children }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [text, setText] = useState<string>("");
+  const [type, setType] = useState<NotificationType>("info");
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -52,8 +53,9 @@ export const NotificationLayout: FC<PropsWithChildren> = ({ children }) => {
   }, [handleClose]);
 
   const showNotification = useCallback(
-    (message: string) => {
+    (message: string, typeNotify: "success" | "info" | "error") => {
       setText(message);
+      setType(typeNotify);
       handleOpen();
     },
     [handleOpen]
@@ -67,7 +69,7 @@ export const NotificationLayout: FC<PropsWithChildren> = ({ children }) => {
   return (
     <NotificationContext.Provider value={contextValue}>
       {children}
-      {isOpen && <Notification text={text} onClose={handleClose} />}
+      {isOpen && <Notification text={text} onClose={handleClose} type={type} />}
     </NotificationContext.Provider>
   );
 };
