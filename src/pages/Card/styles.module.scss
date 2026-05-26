@@ -1,13 +1,19 @@
 @import "../../_variables";
 
 .card {
-  min-height: 100vh;
+  height: auto;
+
   &__content {
     padding: 30px 0;
+    height: 100%;
   }
+
+  &-container {
+    height: 100%;
+  }
+
   @media (min-width: $mw3) {
-    &__content {
-      padding: 50px 0;
-    }
+    min-height: 700px;
+    height: 100vh;
   }
 }

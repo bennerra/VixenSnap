@@ -13,6 +13,7 @@ import {
   useSetLikeToCardMutation,
 } from "@/store/api/CardsApi";
 
+import { NotificationContext } from "@/context/NotificationContext";
 import styles from "./styles.module.scss";
 
 const cx = classNames.bind(styles);
@@ -47,6 +48,7 @@ const CardInfo: FC<CardInfoProps> = ({
   const [quantityLikes, setQuantityLikes] = useState<number>(likes);
   const [commentText, setCommentText] = useState<string>("");
   const { data } = useGetCommentsQuery({ id });
+  const { showNotification } = useContext(NotificationContext);
 
   const linkToUserPage = useMemo(() => {
     return `/profile/${author_name}`;
@@ -58,7 +60,7 @@ const CardInfo: FC<CardInfoProps> = ({
       setHasLike(response.is_liked);
       setQuantityLikes(response.count);
     } catch (e) {
-      console.log(e);
+      showNotification("Не удалось поставить лайк", "error");
     }
   };
 
@@ -66,8 +68,9 @@ const CardInfo: FC<CardInfoProps> = ({
     try {
       const response = await saveCard({ id }).unwrap();
       setHasSave(response.is_saved);
+      showNotification("Пост сохранен в избранное", "success");
     } catch (e) {
-      console.log(e);
+      showNotification("Не удалось сохранить в избранное", "error");
     }
   };
 
@@ -80,8 +83,9 @@ const CardInfo: FC<CardInfoProps> = ({
         text: commentText,
       });
       setCommentText("");
+      showNotification("Комментарий добавлен", "success");
     } catch (e) {
-      console.log(e);
+      showNotification("Не удалось добавить комментарий", "error");
     }
   };
 
@@ -113,114 +117,118 @@ const CardInfo: FC<CardInfoProps> = ({
         <div className={cx("card-info__photo")}>
           <img src={img} alt="" />
         </div>
-        <div
-          className={cx(
-            "card-info__content",
-            "card-content",
-            `card-info__content-${theme}`
-          )}
-        >
+        <div className={cx("card-info__content-wrapper")}>
           <div
             className={cx(
-              "card-content__about",
-              "card-about",
-              `card-about-${theme}`
+              "card-info__content",
+              "card-content",
+              `card-info__content-${theme}`
             )}
           >
-            <Link to={linkToUserPage}>
-              <div className={cx("card_author")}>{author_name}</div>
-            </Link>
-            <h2 className={cx("card-about__title")}>{title}</h2>
-            <p className={cx("card-about__description")}>{description}</p>
-          </div>
-          <div className={cx("card-content__save", "card-save")}>
-            <div className={cx("card-save__button")}>
-              <Button
-                theme={theme}
-                text={hasSave ? "Сохранить" : "Сохранено"}
-                color={hasSave ? "orange" : "gray"}
-                size="medium"
-                onClick={handleSave}
-              />
+            <div
+              className={cx(
+                "card-content__about",
+                "card-about",
+                `card-about-${theme}`
+              )}
+            >
+              <Link to={linkToUserPage}>
+                <div className={cx("card_author")}>{author_name}</div>
+              </Link>
+              <h2 className={cx("card-about__title")}>{title}</h2>
+              <p className={cx("card-about__description")}>{description}</p>
             </div>
-            <div className={cx("card-save__likes", "card-likes")}>
-              <div onClick={handleIsLiked} className={cx("card-likes__img")}>
-                {hasLike ? <Like /> : <EmptyLike />}
+            <div className={cx("card-content__save", "card-save")}>
+              <div className={cx("card-save__button")}>
+                <Button
+                  theme={theme}
+                  text={hasSave ? "Сохранить" : "Сохранено"}
+                  color={hasSave ? "orange" : "gray"}
+                  size="medium"
+                  onClick={handleSave}
+                />
               </div>
-              {quantityLikes}
-            </div>
-          </div>
-          <div className={cx("comments-section", `comments-section-${theme}`)}>
-            <h3 className={cx("comments-section__title")}>
-              Комментарии ({data?.count || 0})
-            </h3>
-            <div className={cx("comment-form", `comment-form-${theme}`)}>
-              <textarea
-                className={cx(
-                  "comment-form__input",
-                  `comment-form__input-${theme}`
-                )}
-                placeholder="Напишите комментарий..."
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                rows={3}
-              />
-              <Button
-                theme={theme}
-                text="Отправить"
-                color="orange"
-                size="medium"
-                onClick={handleAddComment}
-                disabled={!commentText.trim()}
-              />
-            </div>
-            <div className={cx("comments-list", `comments-list-${theme}`)}>
-              {!data?.count ? (
-                <div
-                  className={cx(
-                    "comments-list__empty",
-                    `comments-list__empty-${theme}`
-                  )}
-                >
-                  Пока нет комментариев. Будьте первым!
+              <div className={cx("card-save__likes", "card-likes")}>
+                <div onClick={handleIsLiked} className={cx("card-likes__img")}>
+                  {hasLike ? <Like /> : <EmptyLike />}
                 </div>
-              ) : (
-                data.results.map((comment) => (
+                {quantityLikes}
+              </div>
+            </div>
+            <div
+              className={cx("comments-section", `comments-section-${theme}`)}
+            >
+              <h3 className={cx("comments-section__title")}>
+                Комментарии ({data?.count || 0})
+              </h3>
+              <div className={cx("comment-form", `comment-form-${theme}`)}>
+                <textarea
+                  className={cx(
+                    "comment-form__input",
+                    `comment-form__input-${theme}`
+                  )}
+                  placeholder="Напишите комментарий..."
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  rows={3}
+                />
+                <Button
+                  theme={theme}
+                  text="Отправить"
+                  color="orange"
+                  size="medium"
+                  onClick={handleAddComment}
+                  disabled={!commentText.trim()}
+                />
+              </div>
+              <div className={cx("comments-list", `comments-list-${theme}`)}>
+                {!data?.count ? (
                   <div
-                    key={comment.id}
-                    className={cx("comment-item", `comment-item-${theme}`)}
+                    className={cx(
+                      "comments-list__empty",
+                      `comments-list__empty-${theme}`
+                    )}
                   >
-                    <div className={cx("comment-item__header")}>
-                      <Link to={`/profile/${comment.author_id}`}>
+                    Пока нет комментариев. Будьте первым!
+                  </div>
+                ) : (
+                  data.results.map((comment) => (
+                    <div
+                      key={comment.id}
+                      className={cx("comment-item", `comment-item-${theme}`)}
+                    >
+                      <div className={cx("comment-item__header")}>
+                        <Link to={`/profile/${comment.author_id}`}>
+                          <span
+                            className={cx(
+                              "comment-item__author",
+                              `comment-item__author-${theme}`
+                            )}
+                          >
+                            {comment.author_name}
+                          </span>
+                        </Link>
                         <span
                           className={cx(
-                            "comment-item__author",
-                            `comment-item__author-${theme}`
+                            "comment-item__date",
+                            `comment-item__date-${theme}`
                           )}
                         >
-                          {comment.author_name}
+                          {formatDate(comment.created_at)}
                         </span>
-                      </Link>
-                      <span
+                      </div>
+                      <p
                         className={cx(
-                          "comment-item__date",
-                          `comment-item__date-${theme}`
+                          "comment-item__text",
+                          `comment-item__text-${theme}`
                         )}
                       >
-                        {formatDate(comment.created_at)}
-                      </span>
+                        {comment.text}
+                      </p>
                     </div>
-                    <p
-                      className={cx(
-                        "comment-item__text",
-                        `comment-item__text-${theme}`
-                      )}
-                    >
-                      {comment.text}
-                    </p>
-                  </div>
-                ))
-              )}
+                  ))
+                )}
+              </div>
             </div>
           </div>
         </div>

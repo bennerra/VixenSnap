@@ -85,7 +85,7 @@ const ProfileInfo: FC<ProfileInfoProps> = ({ user }) => {
         setCards([...response.results]);
         setTotalCount(response.count);
       } catch (e) {
-        console.log(e);
+        showNotification("Не удалось получить список постов", "error");
       }
     };
 
@@ -99,7 +99,10 @@ const ProfileInfo: FC<ProfileInfoProps> = ({ user }) => {
         setSavedCards([...response.results]);
         setSavedTotalCount(response.count);
       } catch (e) {
-        console.log(e);
+        showNotification(
+          "Не удалось получить список сохраненных постов",
+          "error"
+        );
       }
     };
 
@@ -135,15 +138,25 @@ const ProfileInfo: FC<ProfileInfoProps> = ({ user }) => {
   };
 
   const onFollow = () => {
-    if (isCurrentUser) return;
+    try {
+      if (isCurrentUser) return;
 
-    follow({ user_identifier: id || "" });
+      follow({ user_identifier: id || "" });
+      showNotification("Вы подписались на пользователя", "success");
+    } catch (e) {
+      showNotification("Не удалось подписаться на пользователя", "error");
+    }
   };
 
   const onUnfollow = () => {
-    if (isCurrentUser) return;
+    try {
+      if (isCurrentUser) return;
 
-    unfollow({ user_identifier: id || "" });
+      unfollow({ user_identifier: id || "" });
+      showNotification("Вы отписались от пользователя", "success");
+    } catch (e) {
+      showNotification("Не удалось отписаться от пользователя", "error");
+    }
   };
 
   const tabsContent = {

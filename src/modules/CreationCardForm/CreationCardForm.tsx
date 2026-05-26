@@ -19,6 +19,7 @@ const cx = classNames.bind(styles);
 
 const schema = yup.object().shape({
   name: yup.string().required(),
+  username: yup.string().max(2000, "Поле должно быть не больше 2000 символов"),
 });
 
 const CreationCardForm: FC = () => {

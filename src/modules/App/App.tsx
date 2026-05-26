@@ -32,7 +32,6 @@ const App: FC = () => {
           <Route path={AppRoutes.MAIN} element={<Home />} />
           <Route path={AppRoutes.CREATION} element={<CreationCard />} />
           <Route path={AppRoutes.PROFILE} element={<Profile />} />
-          <Route path={AppRoutes.PROFILE_ME} element={<Profile />} />
           <Route path={AppRoutes.PROFILE_EDIT} element={<ProfileEdit />} />
           <Route path={AppRoutes.CARD_DETAIL} element={<Card />} />
           <Route path={AppRoutes.REGISTRATION} element={<Registration />} />

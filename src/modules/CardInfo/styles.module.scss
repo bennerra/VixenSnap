@@ -3,14 +3,18 @@
 .card-info {
   color: $grey-umber;
   width: 100%;
+  height: 100%;
   margin: 0 auto;
   background: $color-white;
   transition: all 0.3s ease-in-out;
+
   &-dark {
     background: $grey-umber;
     color: $light-gray-hover;
   }
+
   &__container {
+    height: 100%;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -18,73 +22,108 @@
     border: 1px solid $light-gray;
     border-radius: 30px;
     transition: all 0.3s ease-in-out;
+
     &-dark {
       border-color: $wet-asphalt;
     }
   }
+
   &__photo {
+    border-radius: 27px 27px 0 0;
+    background-color: rgba(0, 0, 0, 0.3);
     width: 100%;
+    height: 100%;
+
     & > * {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       border-radius: 27px 27px 0 0;
     }
   }
+
+  &__content-wrapper {
+    width: 100%;
+    padding: 40px 20px;
+  }
+
   &__content {
-    padding: 15px 15px 30px 15px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     min-height: 250px;
     gap: 30px;
+    height: 100%;
+    padding: 0 10px;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: $light-gray;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $color-orange;
+      border-radius: 3px;
+    }
+
+    &-dark {
+      &::-webkit-scrollbar-track {
+        background: $wet-asphalt;
+      }
+    }
   }
-  @media (min-width: $mw1) {
+
+  @media (min-width: $mw3) {
     &__container {
       min-height: 350px;
       flex-direction: row;
       justify-content: space-between;
     }
     &__photo {
+      border-radius: 27px 0 0 27px;
+
       & > * {
         border-radius: 27px 0 0 27px;
       }
     }
     &__content {
-      width: 80%;
-      padding: 30px;
       display: flex;
+      overflow-y: auto;
       flex-direction: column;
-      min-height: 250px;
       gap: 24px;
     }
-  }
-  @media (min-width: $mw2) {
-    &__content {
-      padding: 40px 30px;
-      width: 90%;
+    &__content-wrapper {
+      width: 80%;
+      padding: 40px 20px;
     }
   }
-  @media (min-width: $mw3) {
-    width: 90%;
-  }
 }
+
 .card-about {
   color: $grey-umber;
   transition: all 0.3s ease-in-out;
+
   &-dark {
     color: $light-gray-hover;
   }
+
   &__title {
     font-weight: 600;
     font-size: 18px;
     margin-bottom: 15px;
   }
+
   &__description {
     white-space: pre-line;
     font-weight: 500;
     font-size: 15px;
     margin-bottom: 24px;
   }
+
   @media (min-width: $mw2) {
     &__name {
       font-size: 16px;
@@ -99,30 +138,36 @@
     }
   }
 }
+
 .card-save {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 30px;
+
   &__button {
     width: 150px;
   }
+
   @media (min-width: $mw3) {
     &__button {
       width: 200px;
     }
   }
 }
+
 .card-likes {
   display: flex;
   align-items: center;
   gap: 10px;
   font-size: 23px;
   font-weight: 500;
+
   &__img {
     cursor: pointer;
     width: 27px;
     height: 27px;
+
     & > * {
       width: 100%;
       height: 100%;
@@ -199,30 +244,6 @@
 }
 
 .comments-list {
-  max-height: 400px;
-  overflow-y: auto;
-  padding-right: 10px;
-
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: $light-gray;
-    border-radius: 3px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: $color-orange;
-    border-radius: 3px;
-  }
-
-  &-dark {
-    &::-webkit-scrollbar-track {
-      background: $wet-asphalt;
-    }
-  }
-
   &__empty {
     text-align: center;
     padding: 40px 20px;

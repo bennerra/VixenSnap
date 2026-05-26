@@ -12,7 +12,8 @@ import { ThemeContext } from "@/context";
 import { Button } from "@/ui/Button";
 
 import { useGetUserMeQuery, useUpdateUserMutation } from "@/store/api/UsersApi";
-import { AppRoutes } from "@/constants/paths";
+import { NotificationContext } from "@/context/NotificationContext";
+
 import styles from "./styles.module.scss";
 
 const cx = classNames.bind(styles);
@@ -166,6 +167,7 @@ export const ProfileEdit: FC = () => {
 
   const [updateProfile] = useUpdateUserMutation();
   const isEditPassword = watch("isEditPassword");
+  const { showNotification } = useContext(NotificationContext);
 
   // Загрузка текущего аватара как File
   useEffect(() => {
@@ -231,9 +233,10 @@ export const ProfileEdit: FC = () => {
 
     try {
       await updateProfile({ data: sendData }).unwrap();
-      navigate(AppRoutes.PROFILE_ME);
+      navigate(`profile/${profileData.username}`);
+      showNotification("Профиль успешно отредактирован", "success");
     } catch (error) {
-      console.error("Ошибка при обновлении профиля:", error);
+      showNotification("Не удалось отредактировать профиль", "error");
     }
   };
 
