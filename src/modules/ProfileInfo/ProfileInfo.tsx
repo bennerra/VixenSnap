@@ -137,25 +137,33 @@ const ProfileInfo: FC<ProfileInfoProps> = ({ user }) => {
     setPageSavedCards(nextPage);
   };
 
-  const onFollow = () => {
+  const onFollow = async () => {
     try {
       if (isCurrentUser) return;
 
-      follow({ user_identifier: id || "" });
+      await follow({ user_identifier: id || "" }).unwrap();
       showNotification("Вы подписались на пользователя", "success");
-    } catch (e) {
-      showNotification("Не удалось подписаться на пользователя", "error");
+    } catch (e: any) {
+      if (e?.status) {
+        showNotification("Необходима авторизация", "error");
+      } else {
+        showNotification("Не удалось подписаться на пользователя", "error");
+      }
     }
   };
 
-  const onUnfollow = () => {
+  const onUnfollow = async () => {
     try {
       if (isCurrentUser) return;
 
-      unfollow({ user_identifier: id || "" });
+      await unfollow({ user_identifier: id || "" }).unwrap();
       showNotification("Вы отписались от пользователя", "success");
-    } catch (e) {
-      showNotification("Не удалось отписаться от пользователя", "error");
+    } catch (e: any) {
+      if (e?.status) {
+        showNotification("Необходима авторизация", "error");
+      } else {
+        showNotification("Не удалось отписаться от пользователя", "error");
+      }
     }
   };
 

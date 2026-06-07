@@ -1,4 +1,4 @@
-import { FC, useState, MouseEvent } from "react";
+import { FC, useState, MouseEvent, useContext } from "react";
 import classNames from "classnames/bind";
 import { Link } from "react-router-dom";
 
@@ -11,6 +11,7 @@ import {
   useSetLikeToCardMutation,
 } from "@/store/api/CardsApi";
 
+import { NotificationContext } from "@/context/NotificationContext";
 import styles from "./styles.module.scss";
 
 const cx = classNames.bind(styles);
@@ -31,14 +32,24 @@ const ImageCard: FC<ImageCardProps> = (props) => {
   const [quantityLikes, setQuantityLikes] = useState<number>(likes);
   const [saveCard] = useSaveCardMutation();
   const [hasSave, setHasSave] = useState<boolean>(isSave);
+  const { showNotification } = useContext(NotificationContext);
 
   const handleSetLike = async () => {
     try {
       const response = await setLike({ id }).unwrap();
       setHasLike(response.is_liked);
       setQuantityLikes(response.count);
-    } catch (e) {
-      console.log(e);
+      if (response.is_liked) {
+        showNotification("Вы поставили лайк на пост", "success");
+      } else {
+        showNotification("Вы убрали лайк с поста", "success");
+      }
+    } catch (e: any) {
+      if (e?.status === 401) {
+        showNotification("Необходима авторизация", "error");
+      } else {
+        showNotification("Не удалось поставить лайк", "error");
+      }
     }
   };
 
@@ -47,8 +58,17 @@ const ImageCard: FC<ImageCardProps> = (props) => {
       event.preventDefault();
       const response = await saveCard({ id }).unwrap();
       setHasSave(response.is_saved);
-    } catch (e) {
-      console.log(e);
+      if (response.is_saved) {
+        showNotification("Пост сохранен в избранное", "success");
+      } else {
+        showNotification("Пост удален из избранного", "success");
+      }
+    } catch (e: any) {
+      if (e?.status === 401) {
+        showNotification("Необходима авторизация", "error");
+      } else {
+        showNotification("Не удалось сохранить в избранное", "error");
+      }
     }
   };
 

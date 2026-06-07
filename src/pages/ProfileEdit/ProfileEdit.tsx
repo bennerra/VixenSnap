@@ -233,7 +233,7 @@ export const ProfileEdit: FC = () => {
 
     try {
       await updateProfile({ data: sendData }).unwrap();
-      navigate(`profile/${profileData.username}`);
+      navigate(`/profile/${profileData.username}`);
       showNotification("Профиль успешно отредактирован", "success");
     } catch (error) {
       showNotification("Не удалось отредактировать профиль", "error");

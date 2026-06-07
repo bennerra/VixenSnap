@@ -35,7 +35,7 @@ const Authorization: FC<PropsWithChildren<AuthorizationProps>> = ({
         {title}
       </h1>
       <a
-        href={`${oauthUrl}?client_id=${clientId}&scope=offline,email&response_type=token&redirect_uri=${redirectUri}`}
+        href={`${oauthUrl}?client_id=${clientId}&scope=email&response_type=code&redirect_uri=${redirectUri}`}
       >
         <div
           className={cx(

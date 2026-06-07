@@ -20,6 +20,7 @@ const OAuth: FC = () => {
   const [oAuthUser] = useOAuthUserMutation();
 
   const url = window.location.hash;
+  console.log("url", url);
   const userData = getUserData(url);
 
   const setIsAuth = useCallback(

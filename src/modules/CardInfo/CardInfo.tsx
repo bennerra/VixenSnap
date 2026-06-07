@@ -59,8 +59,17 @@ const CardInfo: FC<CardInfoProps> = ({
       const response = await setLike({ id }).unwrap();
       setHasLike(response.is_liked);
       setQuantityLikes(response.count);
-    } catch (e) {
-      showNotification("Не удалось поставить лайк", "error");
+      if (response.is_liked) {
+        showNotification("Вы поставили лайк на пост", "success");
+      } else {
+        showNotification("Вы убрали лайк с поста", "success");
+      }
+    } catch (e: any) {
+      if (e?.status === 401) {
+        showNotification("Необходима авторизация", "error");
+      } else {
+        showNotification("Не удалось поставить лайк", "error");
+      }
     }
   };
 
@@ -68,9 +77,17 @@ const CardInfo: FC<CardInfoProps> = ({
     try {
       const response = await saveCard({ id }).unwrap();
       setHasSave(response.is_saved);
-      showNotification("Пост сохранен в избранное", "success");
-    } catch (e) {
-      showNotification("Не удалось сохранить в избранное", "error");
+      if (response.is_saved) {
+        showNotification("Пост сохранен в избранное", "success");
+      } else {
+        showNotification("Пост удален из избранного", "success");
+      }
+    } catch (e: any) {
+      if (e?.status === 401) {
+        showNotification("Необходима авторизация", "error");
+      } else {
+        showNotification("Не удалось сохранить в избранное", "error");
+      }
     }
   };
 
@@ -81,11 +98,15 @@ const CardInfo: FC<CardInfoProps> = ({
       await addComment({
         post: id,
         text: commentText,
-      });
+      }).unwrap();
       setCommentText("");
       showNotification("Комментарий добавлен", "success");
-    } catch (e) {
-      showNotification("Не удалось добавить комментарий", "error");
+    } catch (e: any) {
+      if (e?.status) {
+        showNotification("Необходима авторизация", "error");
+      } else {
+        showNotification("Не удалось добавить комментарий", "error");
+      }
     }
   };
 
