@@ -13,6 +13,7 @@ interface Props {
 export const NavigateRouter: FC<Props> = ({ currentPage, children }) => {
   const navigate = useNavigate();
   const refreshToken = cookies.get(CookiesNames.AUTH);
+  const shouldIgnoreRedirect = currentPage === AppRoutes.VK_AUTH;
   let route: string = currentPage;
 
   if (refreshToken && NotAuthPaths.includes(currentPage)) {
@@ -24,10 +25,12 @@ export const NavigateRouter: FC<Props> = ({ currentPage, children }) => {
   }
 
   useEffect(() => {
+    if (shouldIgnoreRedirect) return;
+
     if (route !== window.location.pathname) {
       navigate(route);
     }
-  }, [route, navigate]);
+  }, [route, navigate, shouldIgnoreRedirect]);
 
   return <div>{children}</div>;
 };

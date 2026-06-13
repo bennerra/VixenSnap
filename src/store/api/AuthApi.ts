@@ -2,7 +2,6 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 
 import { ILoginForm, ILogout, IRefresh } from "@/models/ILoginForm";
 import { IRegistrationForm } from "@/models/IRegistrationForm";
-import { IOAuthUser } from "@/models/IOAuthUser";
 import { baseQueryWithReauth } from "@/store/baseQueryWithReauth";
 
 export const authApi = createApi({
@@ -37,9 +36,13 @@ export const authApi = createApi({
         body: credentials,
       }),
     }),
-    oAuthUser: builder.mutation<any, IOAuthUser>({
-      query: (credentials) => ({
-        url: "token/oauth/",
+    oAuthUser: builder.mutation({
+      query: (credentials: {
+        code: string;
+        device_id?: string;
+        state?: string;
+      }) => ({
+        url: "/auth/vk/",
         method: "POST",
         body: credentials,
       }),

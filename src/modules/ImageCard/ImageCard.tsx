@@ -23,10 +23,11 @@ interface ImageCardProps {
   id: string;
   isLiked: boolean;
   isSave: boolean;
+  fetchSavedCards?: () => void;
 }
 
 const ImageCard: FC<ImageCardProps> = (props) => {
-  const { img, title, likes, id, isLiked, isSave } = props;
+  const { img, title, likes, id, isLiked, isSave, fetchSavedCards } = props;
   const [setLike] = useSetLikeToCardMutation();
   const [hasLike, setHasLike] = useState<boolean>(isLiked);
   const [quantityLikes, setQuantityLikes] = useState<number>(likes);
@@ -63,6 +64,7 @@ const ImageCard: FC<ImageCardProps> = (props) => {
       } else {
         showNotification("Пост удален из избранного", "success");
       }
+      if (fetchSavedCards) fetchSavedCards();
     } catch (e: any) {
       if (e?.status === 401) {
         showNotification("Необходима авторизация", "error");

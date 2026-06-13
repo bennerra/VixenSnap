@@ -16,8 +16,16 @@ interface AuthorizationProps {
 }
 
 const oauthUrl = process.env.REACT_APP_OAUTH_URL;
-const clientId = process.env.REACT_APP_CLIENT_ID;
-const redirectUri = process.env.REACT_APP_REDIRECT_URI;
+
+const authQueryParams = {
+  response_type: "code",
+  client_id: process.env.REACT_APP_CLIENT_ID,
+  code_challenge: process.env.REACT_APP_CODE_CHALLENGE,
+  code_challenge_method: "S256",
+  scope: "email",
+  redirect_uri: process.env.REACT_APP_REDIRECT_URI,
+  state: process.env.REACT_APP_STATE,
+};
 
 const Authorization: FC<PropsWithChildren<AuthorizationProps>> = ({
   title,
@@ -35,7 +43,9 @@ const Authorization: FC<PropsWithChildren<AuthorizationProps>> = ({
         {title}
       </h1>
       <a
-        href={`${oauthUrl}?client_id=${clientId}&scope=email&response_type=code&redirect_uri=${redirectUri}`}
+        href={`${oauthUrl}?${Object.entries(authQueryParams)
+          .map(([key, value]) => `${key}=${value}`)
+          .join("&")}`}
       >
         <div
           className={cx(

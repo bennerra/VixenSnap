@@ -163,8 +163,8 @@ const CardInfo: FC<CardInfoProps> = ({
               <div className={cx("card-save__button")}>
                 <Button
                   theme={theme}
-                  text={hasSave ? "Сохранить" : "Сохранено"}
-                  color={hasSave ? "orange" : "gray"}
+                  text={!hasSave ? "Сохранить" : "Сохранено"}
+                  color={!hasSave ? "orange" : "gray"}
                   size="medium"
                   onClick={handleSave}
                 />

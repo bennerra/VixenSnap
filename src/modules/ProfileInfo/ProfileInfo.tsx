@@ -74,38 +74,38 @@ const ProfileInfo: FC<ProfileInfoProps> = ({ user }) => {
     navigate(AppRoutes.PROFILE_EDIT);
   };
 
+  const fetchCards = async () => {
+    try {
+      const payload = {
+        page,
+        id: username,
+      };
+      const response = await getCards(payload).unwrap();
+      setCards([...response.results]);
+      setTotalCount(response.count);
+    } catch (e) {
+      showNotification("Не удалось получить список постов", "error");
+    }
+  };
+
+  const fetchSavedCards = async () => {
+    try {
+      const payload = {
+        page: pageSavedCards,
+        id: username,
+      };
+      const response = await getSavedCards(payload).unwrap();
+      setSavedCards([...response.results]);
+      setSavedTotalCount(response.count);
+    } catch (e) {
+      showNotification(
+        "Не удалось получить список сохраненных постов",
+        "error"
+      );
+    }
+  };
+
   useEffect(() => {
-    const fetchCards = async () => {
-      try {
-        const payload = {
-          page,
-          id: username,
-        };
-        const response = await getCards(payload).unwrap();
-        setCards([...response.results]);
-        setTotalCount(response.count);
-      } catch (e) {
-        showNotification("Не удалось получить список постов", "error");
-      }
-    };
-
-    const fetchSavedCards = async () => {
-      try {
-        const payload = {
-          page: pageSavedCards,
-          id: username,
-        };
-        const response = await getSavedCards(payload).unwrap();
-        setSavedCards([...response.results]);
-        setSavedTotalCount(response.count);
-      } catch (e) {
-        showNotification(
-          "Не удалось получить список сохраненных постов",
-          "error"
-        );
-      }
-    };
-
     fetchCards();
     fetchSavedCards();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -202,6 +202,7 @@ const ProfileInfo: FC<ProfileInfoProps> = ({ user }) => {
                 cards={savedCards}
                 totalCount={savedTotalCount}
                 fetchMore={onFetchMoreSavedCards}
+                fetchSavedCards={fetchSavedCards}
               />
             ) : (
               <div className={styles.loaderContainer}>Посты не найдены</div>

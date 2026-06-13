@@ -11,10 +11,11 @@ type Props = {
   cards: IGetCards[];
   fetchMore: () => void;
   totalCount: number;
+  fetchSavedCards?: () => void;
 };
 
 const CardsInfiniteScroll: FC<Props> = (props) => {
-  const { cards, fetchMore, totalCount } = props;
+  const { cards, fetchMore, totalCount, fetchSavedCards } = props;
   const { width } = useResize();
 
   return (
@@ -34,6 +35,7 @@ const CardsInfiniteScroll: FC<Props> = (props) => {
             id={card.id}
             isLiked={card.is_liked}
             isSave={card.is_saved}
+            fetchSavedCards={fetchSavedCards}
           />
         ))}
       </Masonry>
